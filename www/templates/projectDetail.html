@@ -1,0 +1,86 @@
+<ion-view ng-controller="ProjectDetailCtrl"  title="Project {{project.Name}}">
+  <ion-content padding="true">
+    <form ng-submit="submitForm()">
+    <div class="card">
+        <div class="item item-divider">
+            <h4>{{ project.Name }}</h4>
+
+        </div>
+        <div class="item item-text-wrap">
+            <textarea ng-model="project.formDescription"></textarea>
+
+        </div>
+    </div>
+
+    <div class="row">
+
+        <div class="col">
+                <div class="item item-divider">
+                <h4>Location</h4>
+                </div>
+                <div class="item item-text-wrap">
+                <p>{{ project.location }}</p>
+                </div>
+        </div>
+
+        <div class="col">
+                <div class="item item-divider">
+                <h4>Time</h4>
+                </div>
+                <div class="item item-text-wrap">
+                <p>TBC</p>
+                </div>
+        </div>
+
+        <div class="col">
+                <div class="item item-divider">
+                <h4>Expense</h4>
+                </div>
+                <div class="item item-text-wrap">
+                <p>£ TBC</p>
+                </div>
+        </div>
+
+    </div>
+
+     <div class="row">
+        <div class="col">
+            <button ngClick="Submit"  class="button button-block button-positive icon-left ion-checkmark">
+            Save
+            </button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col">
+            <a class="button button-block button-positive" href="#tab/project/time/new/{{project.Id}}">
+            New Time
+            </a>
+        </div>
+        <div class="col">
+            <a class="button button-block button-positive" href="#tab/project/expense/new/{{project.Id}}">
+            New Expense
+            </a>
+        </div>
+    </div>
+    </form>
+
+    <div class="list card">
+
+          <a href="#tab/project/time/{{project.Id}}" class="item item-icon-left">
+            <i class="icon ion-clock"></i>
+            View Time Records
+          </a>
+
+          <a href="#tab/project/expense/{{project.Id}}" class="item item-icon-left">
+            <i class="icon ion-card"></i>
+            View Expense Records
+          </a>
+
+    </div>
+
+    <!-- <p><a class="button button-small icon ion-arrow-left-b" href="#/tab/projects"> All Projects</a></p>
+    -->
+
+  </ion-content>
+</ion-view>

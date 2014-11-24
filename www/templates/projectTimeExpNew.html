@@ -1,0 +1,38 @@
+<ion-view title="New {{recordType}}">
+  <ion-content padding="true">
+    <form name="expenseForm" ng-controller="ProjectExpNewCtrl" ng-submit="submitForm()">
+      <div class="list">
+        <span ng-switch="recordType">
+           <span name="timesheetspan" ng-switch-when="Timesheet">
+              <label class="item item-input item-stacked-label">
+                <span class="input-label">Description</span>
+                <input name="description" ng-model="description" type="text" placeholder="What did you spend time doing?" />
+              </label>
+              <label class="item item-input item-stacked-label">
+                <span class="input-label">Duration in minutes</span>
+                  <input name="expenseValue" ng-model="expenseValue"  type="number" />
+              </label>
+           </span>
+           <span ng-switch-when="Expense">
+              <label class="item item-input item-stacked-label">
+                <span class="input-label">Description</span>
+                <input name="description" ng-model="description"  type="text" placeholder="What did you spend money on?" />
+              </label>
+              <label class="item item-input item-stacked-label">
+                <span class="input-label">How much was it?</span>
+                  <input name="expenseValue" ng-model="expenseValue"  type="number" />
+              </label>
+           </span>
+        </span>
+      </div>
+      <div class="row">
+        <div class="col">
+          <button class="button-full button icon-left ion-checkmark button-positive" >Submit</button>
+        </div>
+        <div class="col">
+          <a class="button-full button icon-left ion-close button-assertive" href="#/tab/project/{{projectId}}">Cancel</a>
+        </div>
+      </div>
+    </form>
+  </ion-content>
+</ion-view>

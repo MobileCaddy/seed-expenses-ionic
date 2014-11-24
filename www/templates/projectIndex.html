@@ -1,0 +1,35 @@
+ <ion-view title="Projects">
+  <ion-content>
+     <ion-refresher on-refresh="doRefresh()"
+                     pulling-text="Pull to refresh..."
+                     refreshing-text="Refreshing!"
+                     refreshing-icon="ion-loading-c">
+
+      </ion-refresher>
+
+    <ion-list>
+      <label class="item item-input">
+        <i class="icon ion-search placeholder-icon"></i>
+        <input type="text" ng-model="query" />
+      </label>
+
+      <!--<ion-item class="item mti-item"
+        collection-repeat="project in projects | filter:query" type="item-text-wrap"
+        href="#/tab/project/{{project.Id}}"
+        collection-item-width="'100%'"
+        collection-item-height="getItemHeight(tableRec, $index)"
+        ng-style="{height: getItemHeight(tableRec, $index)}"
+        >
+        <h3>{{project.Name}}</h3>
+        <p>{{project.Description__c}}</p>
+      </ion-item>-->
+
+      <ion-item ng-repeat="project in projects | orderBy:'-LastModifiedDate' |filter:query" type="item-text-wrap" href="#/tab/project/{{project.Id}}">
+        <h3>{{project.Name}}</h3>
+        <p>{{project.Description__c}}</p>
+      </ion-item>
+
+    </ion-list>
+
+  </ion-content>
+</ion-view>
