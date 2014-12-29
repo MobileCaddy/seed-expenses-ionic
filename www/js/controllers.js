@@ -1,13 +1,34 @@
 angular.module('starter.controllers', ['ionic'])
 
-.controller('ProjectIndexCtrl', function($scope, $rootScope, ProjectService) {
+.controller('ProjectIndexCtrl', function($scope, $rootScope, $ionicLoading, ProjectService) {
 
-  ProjectService.all(false).then(function(projects) {
+  // Setup the loader and starting templates
+  if (typeof($rootScope.child) == "undefined") {
+    $ionicLoading.show({
+      template: '<h1>Loading...</h1><p>Fetching Projects...</p><p><i class="icon ion-loading-b" style="font-size: 32px"></i>',
+      animation: 'fade-in',
+      showBackdrop: true,
+      maxWidth: 600,
+      duration: 30000
+    });
+  }
+
+  var localProjCB = function(localProjects) {
+    $rootScope.projects = localProjects;
+    console.log('Angular: localProjCB, got projects with arr len', localProjects.length);
+    if (localProjects.length > 0){
+      $ionicLoading.hide();
+    }
+  };
+
+  ProjectService.all($rootScope.refreshFlag, localProjCB).then(function(projects) {
     $rootScope.projects = projects;
     console.log('Angular: ProjectIndexCtrl, got projects');
+    $ionicLoading.hide();
   }, function(reason) {
     console.log('Angular: promise returned reason -> ' + reason);
   });
+  $rootScope.refreshFlag = false;
 
 
 
@@ -28,19 +49,38 @@ angular.module('starter.controllers', ['ionic'])
 })
 
 
-.controller('ProjectDetailCtrl', function($scope, $stateParams, ProjectService) {
+.controller('ProjectDetailCtrl', function($scope, $rootScope, $stateParams, $ionicLoading,  ProjectService) {
   $scope.project = ProjectService.get($stateParams.projectId);
-  $scope.project.formDescription = $scope.project.Description__c;
-  // Handle submitForm : here we need to take any 'form fields', map them to
-  // the MC object and call the update.
+  $scope.project.formDescription = $scope.project.mc_package_002__Description__c;
+
+  /*
+   * Handle submitForm : here we need to take any 'form fields', map them to
+   * the MC object and call the update.
+   */
   $scope.submitForm = function() {
     console.log('Angular: submitForm');
-    $scope.project.Description__c = $scope.project.formDescription;
-    delete $scope.project.formDescription;
-    delete $scope.project.location;
-    delete $scope.project.$$hashKey;
-    console.log('Angular: update, project -> ' + angular.toJson($scope.project));
-    ProjectService.update($scope.project);
+    var newProj = $scope.project;
+    newProj.mc_package_002__Description__c = newProj.formDescription;
+    delete newProj.formDescription;
+    delete newProj.location;
+    delete newProj.$$hashKey;
+    console.log('Angular: update, project -> ' + angular.toJson(newProj));
+    $ionicLoading.show({
+      template: '<h1>Saving...</h1><p>Saving project...</p><i class="icon ion-loading-b" style="font-size: 32px"></i>',
+      animation: 'fade-in',
+      showBackdrop: true,
+      maxWidth: 600,
+      duration: 30000
+    });
+    ProjectService.update(newProj).then(function(retObject) {
+      console.log('Angular: update, retObject -> ' + angular.toJson(retObject));
+      $ionicLoading.hide();
+      $rootScope.refreshFlag = true;
+      window.history.back();
+    }).catch(function(returnErr) {
+      console.error('Angular: update,  returnErr ->' + angular.toJson(returnErr));
+      $ionicLoading.hide();
+    }); // end update error callback
   };
 })
 
@@ -61,41 +101,53 @@ angular.module('starter.controllers', ['ionic'])
 
 
 
-.controller('ProjectExpNewCtrl', function($scope, $stateParams, $ionicPopup, $ionicModal, ProjectService) {
+.controller('ProjectExpNewCtrl', function($scope, $stateParams, $ionicLoading, $ionicPopup, $ionicModal, ProjectService) {
 
   switch ($stateParams.type) {
       case 'time' :
         $scope.recordType = "Timesheet";
-        valueFieldName = "Duration_Minutes__c";
+        valueFieldName = "mc_package_002__Duration_Minutes__c";
         break;
       default :
         $scope.recordType = 'Expense';
-        valueFieldName = "Expense_Amount__c";
+        valueFieldName = "mc_package_002__Expense_Amount__c";
     }
   $scope.projectId = $stateParams.projectId;
   $scope.description = "";
 
+  /*
+   * Handle submitForm
+   */
   $scope.submitForm = function() {
     varNewExp = {
-      "Short_Description__c": $scope.expenseForm.description.$modelValue,
-      "Name"       : 'TBC-' + Date.now(),
-      "Project__c" : $stateParams.projectId
+      "mc_package_002__Short_Description__c": $scope.expenseForm.description.$modelValue,
+      "Name"       : 'TMP-' + Date.now(),
+      "mc_package_002__Project__c" : $stateParams.projectId
     };
     switch ($stateParams.type) {
       case 'time' :
-        varNewExp.Duration_Minutes__c = $scope.expenseForm.expenseValue.$modelValue;
+        varNewExp.mc_package_002__Duration_Minutes__c = $scope.expenseForm.expenseValue.$modelValue;
         break;
       default :
-        varNewExp.Expense_Amount__c = $scope.expenseForm.expenseValue.$modelValue;
+        varNewExp.mc_package_002__Expense_Amount__c = $scope.expenseForm.expenseValue.$modelValue;
     }
     console.log('Angular: ProjectExpNewCtrl, varNewExp -> ' + angular.toJson(varNewExp));
+    $ionicLoading.show({
+      template: '<h1>Saving...</h1><p>Saving {$stateParams.type} record...</p><i class="icon ion-loading-b" style="font-size: 32px"></i>',
+      animation: 'fade-in',
+      showBackdrop: true,
+      maxWidth: 600,
+      duration: 30000
+    });
     ProjectService.newExpense(varNewExp,
       function(){
         console.log('Angular: ProjectExpNewCtrl, success');
+        $ionicLoading.hide();
         window.history.back();
       },
       function(e) {
         console.error('Angular: ProjectExpNewCtrl, error');
+        $ionicLoading.hide();
         var alertPopup = $ionicPopup.alert({
           title: 'Insert failed!',
           template: '<p>Sorry, something went wrong.</p><p class="error_details">Error: ' + e.status + ' - ' + e.mc_add_status + '</p>'
@@ -111,8 +163,21 @@ angular.module('starter.controllers', ['ionic'])
   ===========================================================================
   */
 
-  .controller('SettingsCtrl', function($scope, $rootScope, $ionicPopup, $location, DevService) {
+.controller('SettingsHBCtrl', function($scope, $rootScope, DevService) {
 
+  if (localStorage.connection) {
+    $scope.heartbeatStatus = localStorage.connection;
+  } else {
+    $scope.heartbeatStatus = 100100;
+  }
+
+  $scope.hbUpdate = function() {
+    localStorage.connection = $scope.heartbeatStatus;
+  };
+
+})
+
+  .controller('SettingsCtrl', function($scope, $rootScope, $ionicPopup, $ionicLoading, $location, DevService, ProjectService) {
 
   /*
   ---------------------------------------------------------------------------
@@ -121,6 +186,8 @@ angular.module('starter.controllers', ['ionic'])
   */
   $scope.logoutAllowedClass = 'disabled';
   $scope.recsToSyncCount = 0;
+
+  $scope.codeflow = LOCAL_DEV;
 
   DevService.allRecords('recsToSync', false)
     .then(function(recsToSyncRecs) {
@@ -275,6 +342,7 @@ angular.module('starter.controllers', ['ionic'])
       }
     });
   };
+
 
 })
 

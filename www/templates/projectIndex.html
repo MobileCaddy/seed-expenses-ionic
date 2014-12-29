@@ -13,7 +13,7 @@
         <input type="text" ng-model="query" />
       </label>
 
-      <!--<ion-item class="item mti-item"
+      <ion-item class="item mti-item"
         collection-repeat="project in projects | filter:query" type="item-text-wrap"
         href="#/tab/project/{{project.Id}}"
         collection-item-width="'100%'"
@@ -21,13 +21,13 @@
         ng-style="{height: getItemHeight(tableRec, $index)}"
         >
         <h3>{{project.Name}}</h3>
-        <p>{{project.Description__c}}</p>
-      </ion-item>-->
-
-      <ion-item ng-repeat="project in projects | orderBy:'-LastModifiedDate' |filter:query" type="item-text-wrap" href="#/tab/project/{{project.Id}}">
-        <h3>{{project.Name}}</h3>
-        <p>{{project.Description__c}}</p>
+        <p>{{project.mc_package_002__Description__c}}</p>
       </ion-item>
+
+   <!--    <ion-item ng-repeat="project in projects | orderBy:'-LastModifiedDate' |filter:query" type="item-text-wrap" href="#/tab/project/{{project.Id}}">
+        <h3>{{project.Name}}</h3>
+        <p>{{project.mc_package_002__Description__c}}</p>
+      </ion-item> -->
 
     </ion-list>
 

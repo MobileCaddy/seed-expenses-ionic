@@ -6,28 +6,30 @@
            <span name="timesheetspan" ng-switch-when="Timesheet">
               <label class="item item-input item-stacked-label">
                 <span class="input-label">Description</span>
-                <input name="description" ng-model="description" type="text" placeholder="What did you spend time doing?" />
+                <input name="description" ng-model="description" type="text" placeholder="What did you spend time doing?" required/>
               </label>
               <label class="item item-input item-stacked-label">
                 <span class="input-label">Duration in minutes</span>
-                  <input name="expenseValue" ng-model="expenseValue"  type="number" />
+                  <input name="expenseValue" ng-model="expenseValue"  type="number" required/>
               </label>
            </span>
            <span ng-switch-when="Expense">
               <label class="item item-input item-stacked-label">
                 <span class="input-label">Description</span>
-                <input name="description" ng-model="description"  type="text" placeholder="What did you spend money on?" />
+                <input name="description" ng-model="description"  type="text" placeholder="What did you spend money on?" required/>
               </label>
               <label class="item item-input item-stacked-label">
                 <span class="input-label">How much was it?</span>
-                  <input name="expenseValue" ng-model="expenseValue"  type="number" />
+                  <input name="expenseValue" ng-model="expenseValue"  type="number" required/>
               </label>
            </span>
         </span>
       </div>
       <div class="row">
         <div class="col">
-          <button class="button-full button icon-left ion-checkmark button-positive" >Submit</button>
+          <button
+            ng-disabled="expenseForm.$invalid"
+            class="button-full button icon-left ion-checkmark button-positive" >Submit</button>
         </div>
         <div class="col">
           <a class="button-full button icon-left ion-close button-assertive" href="#/tab/project/{{projectId}}">Cancel</a>

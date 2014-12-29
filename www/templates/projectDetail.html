@@ -45,7 +45,10 @@
 
      <div class="row">
         <div class="col">
-            <button ngClick="Submit"  class="button button-block button-positive icon-left ion-checkmark">
+            <button
+                ngClick="Submit"
+                ng-disabled="project.mc_package_002__Description__c == project.formDescription"
+                class="button button-block button-positive icon-left ion-checkmark">
             Save
             </button>
         </div>

@@ -19,12 +19,13 @@ angular.module('starter.services', ['underscore'])
    * syncStartupTables - syncs tables, doesn't really care about the result
    * @return true
    */
-  function syncStartupTables () {
+  function syncStartupTables (refreshFlag) {
+    var myStartupTables = refreshFlag ? startupTables : ['MC_Time_Expense__ap'] ;
     var sequence = Promise.resolve();
-    startupTables.forEach(function(table){
-      console.log('Angular: syncStartupTables -> ' + table);
+    myStartupTables.forEach(function(table){
+      console.log('Angular: syncStartupTables -> ' + table, refreshFlag);
       sequence = sequence.then(function() {
-        return devUtils.syncMobileTable(table);
+        return devUtils.syncMobileTable(table, refreshFlag);
       }).then(function(resObject) {
         console.log('Angular : Success from syncMobileTable -> ' + angular.toJson(resObject));
       });
@@ -56,20 +57,27 @@ angular.module('starter.services', ['underscore'])
   return deferred.promise;
   }
 
-  function getProjects(refreshFlag) {
-    var firstStartUp = (typeof $rootScope.firstStartUp == 'undefined');
+  function getProjects(refreshFlag, localProjCB) {
+    var firstStartUp = (typeof $rootScope.firstStartUp == 'undefined' || $rootScope.firstStartUp === true);
     var deferred = $q.defer();
     console.log('Angular: getProjects, firstStartUp ->' + firstStartUp);
     if (refreshFlag || firstStartUp) {
       projects = [];
+      if (typeof(localProjCB) != "undefined") {
+        // get localprojects if they exist and return through callback
+        getProjectsFromSmartStore('undefined')
+          .then(function(projects) {
+            localProjCB(projects);
+        });
+      }
       devUtils.syncMobileTable('MC_Project__ap').then(function(resObject){
         console.log('Angular : Success from syncMobileTable -> ' + angular.toJson(resObject));
         getProjectsFromSmartStore('undefined')
           .then(function(projects) {
             deferred.resolve(projects);
-            if (firstStartUp) {
-              syncStartupTables();
-            }
+            //if (firstStartUp) {
+              syncStartupTables(!refreshFlag);
+            //}
         }, function(reason) {
           console.error("Angular: promise returned reason -> " + reason);
           deferred.reject('error');
@@ -150,13 +158,13 @@ angular.module('starter.services', ['underscore'])
       var timeExpense1 =  [];
       if ( type == "time") {
         timeExpense1 = timeExpense.filter(function(el){
-          return el.Duration_Minutes__c !== null &&
-            el.Project__c == projectId;
+          return el.mc_package_002__Duration_Minutes__c !== null &&
+            el.mc_package_002__Project__c == projectId;
         });
         } else {
         timeExpense1 = timeExpense.filter(function(el){
-          return el.Expense_Amount__c !== null &&
-            el.Project__c == projectId;
+          return (el.mc_package_002__Expense_Amount__c !== null && typeof(el.mc_package_002__Expense_Amount__c) != "undefined" ) &&
+            el.mc_package_002__Project__c == projectId;
         });
         }
 
@@ -170,37 +178,38 @@ angular.module('starter.services', ['underscore'])
   }
 
   return {
-    all: function(refreshFlag) {
+    all: function(refreshFlag, localProjCB) {
       console.log('Angular: refreshFlag = ' + refreshFlag);
-      return  getProjects(refreshFlag);
+      return  getProjects(refreshFlag, localProjCB);
     },
     get: function(projectId) {
       console.log('Angular: projects->' + angular.toJson($rootScope.projects));
       var ProjectArr =  _.where($rootScope.projects, {'Id': projectId});
       console.log('Angular: project->' + project);
       project = ProjectArr[0];
-      if(typeof ProjectArr[0].MC_Project_Location__c != 'undefined') {
+      if(typeof ProjectArr[0].mc_package_002__MC_Project_Location__c != 'undefined') {
         if (locations.length <= 0) {
-          locations =  getLocations(ProjectArr[0].MC_Project_Location__c);
+          locations =  getLocations(ProjectArr[0].mc_package_002__MC_Project_Location__c);
         }
-        ProjectArr[0].location =  getLocationFromId(ProjectArr[0].MC_Project_Location__c);
+        ProjectArr[0].location =  getLocationFromId(ProjectArr[0].mc_package_002__MC_Project_Location__c);
       } else {
-        console.log('Angular: no MC_Project_Location__c in project');
+        console.log('Angular: no mc_package_002__MC_Project_Location__c in project');
         ProjectArr[0].location = '-';
       }
       return project;
     },
     update: function(project) {
+      var deferred = $q.defer();
       var tmpProject = angular.copy(project);
       tmpProject.SystemModstamp = new Date().getTime();
       devUtils.updateRecord('MC_Project__ap',tmpProject, 'Id').then(function(retObject) {
         console.log('Angular: update, retObject -> ' + angular.toJson(retObject));
-        projects = [];
-        window.history.back();
-        getProjects(true);
+        deferred.resolve(retObject);
       }).catch(function(returnErr) {
         console.error('Angular: update,  returnErr ->' + angular.toJson(returnErr));
-      }); // end update error callback
+        deferred.reject(returnErr);
+      });
+      return deferred.promise;
     },
     expenses: function(type, projectId) {
       console.log('Angular: getProject, type=' + type + ', Id=' + projectId);
@@ -210,9 +219,9 @@ angular.module('starter.services', ['underscore'])
       console.log('Angular: newExpense -> ' + angular.toJson(varNewExp));
       devUtils.insertRecord('MC_Time_Expense__ap',varNewExp).then(function(res) {
         console.log('Angular: newExpense,  res -> ' + angular.toJson(res));
+        success(res);
         // perform background sync - we're not worried about Promise resp.
         devUtils.syncMobileTable('MC_Time_Expense__ap');
-        success(res);
       }).catch(function(e) {
         console.log('Angular: newExpense,  error=' + e);
         error(e);
@@ -314,7 +323,6 @@ angular.module('starter.services', ['underscore'])
     });
     return deferred.promise;
   }
-
 
   return {
     allTables: function() {
