@@ -1,6 +1,6 @@
 {
   "name": "mobilecaddy-seed-expenses-ionic",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "sf_app_name" : "SeedApp001",
   "mc_utils_resource" : "mc_package_002__MC_Resource_001",
   "devDependencies": {

@@ -49,7 +49,7 @@ angular.module('starter.controllers', ['ionic'])
 })
 
 
-.controller('ProjectDetailCtrl', function($scope, $rootScope, $stateParams, $ionicLoading,  ProjectService) {
+.controller('ProjectDetailCtrl', function($scope, $rootScope, $stateParams, $location, $ionicLoading,  ProjectService) {
   $scope.project = ProjectService.get($stateParams.projectId);
   $scope.project.formDescription = $scope.project.mc_package_002__Description__c;
 
@@ -59,11 +59,9 @@ angular.module('starter.controllers', ['ionic'])
    */
   $scope.submitForm = function() {
     console.log('Angular: submitForm');
-    var newProj = $scope.project;
-    newProj.mc_package_002__Description__c = newProj.formDescription;
-    delete newProj.formDescription;
-    delete newProj.location;
-    delete newProj.$$hashKey;
+    var newProj = {};
+    newProj.Id = $scope.project.Id;
+    newProj.mc_package_002__Description__c  = $scope.project.formDescription;
     console.log('Angular: update, project -> ' + angular.toJson(newProj));
     $ionicLoading.show({
       template: '<h1>Saving...</h1><p>Saving project...</p><i class="icon ion-loading-b" style="font-size: 32px"></i>',
@@ -76,7 +74,7 @@ angular.module('starter.controllers', ['ionic'])
       console.log('Angular: update, retObject -> ' + angular.toJson(retObject));
       $ionicLoading.hide();
       $rootScope.refreshFlag = true;
-      window.history.back();
+      $location.path('/projects');
     }).catch(function(returnErr) {
       console.error('Angular: update,  returnErr ->' + angular.toJson(returnErr));
       $ionicLoading.hide();
