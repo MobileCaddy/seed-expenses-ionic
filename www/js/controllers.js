@@ -131,7 +131,7 @@ angular.module('starter.controllers', ['ionic'])
     }
     console.log('Angular: ProjectExpNewCtrl, varNewExp -> ' + angular.toJson(varNewExp));
     $ionicLoading.show({
-      template: '<h1>Saving...</h1><p>Saving {$stateParams.type} record...</p><i class="icon ion-loading-b" style="font-size: 32px"></i>',
+      template: '<h1>Saving...</h1><p>Saving ' + $stateParams.type + ' record...</p><i class="icon ion-loading-b" style="font-size: 32px"></i>',
       animation: 'fade-in',
       showBackdrop: true,
       maxWidth: 600,

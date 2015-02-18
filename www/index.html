@@ -60,7 +60,7 @@
       window.USE_FORCETK = true;
       // set the login url to be used by ForceJS (optinal) - only needed if
       // USE_FORCETK set to true
-      window.SF_LOGIN_URL = 'https://eu5.salesforce.com/';
+      window.SF_LOGIN_URL = 'https://login.salesforce.com/';
       // The URL that your CORS proxy is running on
       window.CORS_PROXY_URL = 'http://localhost:3000';
       // Your connected app ID
@@ -113,9 +113,13 @@
       have templates inline in this html file if you'd like).
     -->
     <ion-nav-view>
-      <div class="card">
-        <div class="item item-text-wrap">
-          <p id='app-progress-msg' class="item-icon-left"><i class="icon ion-loading-c"></i>The application is just being built... this may take a few moments.</p>
+      <div id='start-page'>
+        <div id='startlogo'>
+        </div>
+        <div class="card">
+          <div class="item item-text-wrap">
+            <p id='app-progress-msg' class="item-icon-left"><i class="icon ion-loading-c"></i>The application is just being built... this may take a few moments.</p>
+          </div>
         </div>
       </div>
     </ion-nav-view>
