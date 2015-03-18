@@ -1,30 +1,30 @@
 <ion-view title="Debug Tools">
-	<ion-content>
-	<ion-list>
-	<div class="list list-inset">
-		<a class="item item-icon-left" href="#/tab/settings/mti">
-	    	<i class="icon ion-android-storage"></i>
-	    	Mobile Table Inspector
-		</a>
-		<a class="item item-icon-left" href="#/tab/settings/testing">
-	    	<i class="icon ion-beaker"></i>
-	    	Testing Resources
-		</a>
-        <div ng-if="codeflow == true">
-            <a class="item item-icon-left" href="#/tab/settings/deploy">
-            <i class="icon ion-upload"></i>
-            Deploy to Salesforce
-            </a>
-        </div>
-		<a class="item item-icon-left" href="#/tab/settings/logs">
-	    	<i class="icon ion-filing"></i>
-	    	View Logs
-		</a>
-		<a class="item item-icon-left"  ng-click="showConfirmReset()">
-	    	<i class="icon ion-nuclear"></i>
-	    	Reset Application
-		</a>
-	</div>
+  <ion-content>
+  <ion-list>
+  <div class="list list-inset">
+    <a class="item item-icon-left" href="#/tab/settings/mti">
+        <i class="icon ion-soup-can-outline"></i>
+        Mobile Table Inspector
+    </a>
+    <a class="item item-icon-left" href="#/tab/settings/testing">
+        <i class="icon ion-erlenmeyer-flask"></i>
+        Testing Resources
+    </a>
+    <div ng-if="codeflow == true">
+        <a class="item item-icon-left" href="#/tab/settings/deploy">
+        <i class="icon ion-upload"></i>
+        Deploy to Salesforce
+    </a>
+    </div>
+    <a class="item item-icon-left" href="#/tab/settings/logs">
+        <i class="icon ion-filing"></i>
+        View Logs
+    </a>
+    <a class="item item-icon-left"  ng-click="showConfirmReset()">
+        <i class="icon ion-nuclear"></i>
+        Reset Application
+    </a>
+  </div>
 
     <div class="list card" ng-controller="SettingsHBCtrl">
         <div class="item item-divider" >
@@ -38,8 +38,8 @@
         <ion-radio ng-change="hbUpdate()" ng-model="heartbeatStatus" ng-value="'100105'">HB Refresh OK (100105)</ion-radio>
     </div>
 
-	<div class="card">
-		<div class="item item-divider">
+  <div class="card">
+    <div class="item item-divider">
       <h4>Application Details</h4>
 
     </div>
@@ -145,6 +145,6 @@
     </div>
 
   </div>
-	</ion-list>
+  </ion-list>
   </ion-content>
 </ion-view>

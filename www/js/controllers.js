@@ -2,23 +2,26 @@ angular.module('starter.controllers', ['ionic'])
 
 .controller('ProjectIndexCtrl', function($scope, $rootScope, $ionicLoading, ProjectService) {
 
+  // This unhides the nav-bar. The navbar is hidden in the cases where we want a
+  // splash screen, such as in this app
+  e = document.getElementById('my-nav-bar');
+  angular.element(e).removeClass( "mc-hide" );
+
   // Setup the loader and starting templates
   if (typeof($rootScope.child) == "undefined") {
     $ionicLoading.show({
-      template: '<h1>Loading...</h1><p>Fetching Projects...</p><p><i class="icon ion-loading-b" style="font-size: 32px"></i>',
-      animation: 'fade-in',
-      showBackdrop: true,
+      duration: 30000,
+      delay : 400,
       maxWidth: 600,
-      duration: 30000
+      noBackdrop: true,
+      template: '<h1>Loading...</h1><p id="app-progress-msg" class="item-icon-left">Fetching Projects...<ion-spinner/></p>'
     });
   }
 
   var localProjCB = function(localProjects) {
     $rootScope.projects = localProjects;
     console.log('Angular: localProjCB, got projects with arr len', localProjects.length);
-    if (localProjects.length > 0){
-      $ionicLoading.hide();
-    }
+    if (localProjects.length > 0) $ionicLoading.hide();
   };
 
   ProjectService.all($rootScope.refreshFlag, localProjCB).then(function(projects) {
@@ -30,18 +33,11 @@ angular.module('starter.controllers', ['ionic'])
   });
   $rootScope.refreshFlag = false;
 
-
-
-  $scope.getItemHeight = function(item, index) {
-    // seems to be a good height
-    return 70;
-  };
-
   $scope.doRefresh = function() {
   	console.log('Angular: doRefresh');
   	ProjectService.all(true).then(function(projects) {
       $rootScope.projects = projects;
-      console.log('Angular: MTICtrl, projects -> ' + angular.toJson($rootScope.projects));
+      console.log('Angular: ProjectIndexCtrl, projects -> ' + angular.toJson($rootScope.projects));
     }, function(reason) {
       console.log('Angular: promise returned reason -> ' + reason);
     });
@@ -52,6 +48,14 @@ angular.module('starter.controllers', ['ionic'])
 .controller('ProjectDetailCtrl', function($scope, $rootScope, $stateParams, $location, $ionicLoading,  ProjectService) {
   $scope.project = ProjectService.get($stateParams.projectId);
   $scope.project.formDescription = $scope.project.mc_package_002__Description__c;
+
+  var localProjCB = function(localProjects) {
+    if (localProjects.length > 0) {
+      $rootScope.projects = localProjects;
+      $ionicLoading.hide();
+      $location.path('/projects');
+      }
+  };
 
   /*
    * Handle submitForm : here we need to take any 'form fields', map them to
@@ -72,9 +76,11 @@ angular.module('starter.controllers', ['ionic'])
     });
     ProjectService.update(newProj).then(function(retObject) {
       console.log('Angular: update, retObject -> ' + angular.toJson(retObject));
-      $ionicLoading.hide();
-      $rootScope.refreshFlag = true;
-      $location.path('/projects');
+      return ProjectService.all(true, localProjCB);
+    }).then(function(projects) {
+        $rootScope.projects = projects;
+        $ionicLoading.hide();
+        $location.path('/projects');
     }).catch(function(returnErr) {
       console.error('Angular: update,  returnErr ->' + angular.toJson(returnErr));
       $ionicLoading.hide();
@@ -131,11 +137,11 @@ angular.module('starter.controllers', ['ionic'])
     }
     console.log('Angular: ProjectExpNewCtrl, varNewExp -> ' + angular.toJson(varNewExp));
     $ionicLoading.show({
-      template: '<h1>Saving...</h1><p>Saving ' + $stateParams.type + ' record...</p><i class="icon ion-loading-b" style="font-size: 32px"></i>',
-      animation: 'fade-in',
-      showBackdrop: true,
+      duration: 30000,
+      delay : 400,
       maxWidth: 600,
-      duration: 30000
+      noBackdrop: true,
+      template: '<h1>Saving...</h1><p id="app-progress-msg" class="item-icon-left">Saving ' + $stateParams.type + ' record...<ion-spinner/></p>'
     });
     ProjectService.newExpense(varNewExp,
       function(){
@@ -144,7 +150,7 @@ angular.module('starter.controllers', ['ionic'])
         window.history.back();
       },
       function(e) {
-        console.error('Angular: ProjectExpNewCtrl, error');
+        console.error('Angular: ProjectExpNewCtrl, error', e);
         $ionicLoading.hide();
         var alertPopup = $ionicPopup.alert({
           title: 'Insert failed!',
@@ -233,11 +239,7 @@ angular.module('starter.controllers', ['ionic'])
   ---------------------------------------------------------------------------
   */
   function validateAdminPassword(pword) {
-    if (pword == "123") {
-      return true;
-    } else {
-      return false;
-    }
+    return (pword == "123") ?  true : false;
   }
 
 
@@ -304,25 +306,21 @@ angular.module('starter.controllers', ['ionic'])
           // Codeflow emulator
           for (i = 0; i < localStorage.length; i++) {
             name = localStorage.key( i );
-            if ( name != 'forceOAuth' ) {
-              smartstore.removeSoup(name);
-            }
+            if ( name != 'forceOAuth' ) smartstore.removeSoup(name);
           }
           window.location.assign(window.location.protocol + "//" + window.location.host + "/www");
         } else if ( typeof(mockStore) != "undefined" ) {
           // Platform emulator
           for (i = 0; i < localStorage.length; i++) {
             name = localStorage.key( i );
-            if ( name != 'forceOAuth' ) {
-              smartstore.removeSoup(name);
-            }
+            if ( name != 'forceOAuth' )  smartstore.removeSoup(name);
           }
           var newUrl = window.location.href.substr(0, window.location.href.indexOf('#'));
           window.location.assign(newUrl);
         } else {
           // Device
           DevService.allTables().then(function(tables) {
-            smartstore = cordova.require('salesforce/plugin/smartstore');
+            smartstore = cordova.require('com.salesforce.plugin.smartstore');
             tables.forEach(function(table){
               console.debug("Calling smartstore.removeSoup for " + table.Name);
               smartstore.removeSoup(table.Name);
@@ -374,10 +372,11 @@ angular.module('starter.controllers', ['ionic'])
 
 .controller('MTIDetailCtrl', function($scope, $rootScope,$stateParams, $ionicLoading, DevService) {
   $ionicLoading.show({
-      duration: 30000,
-      noBackdrop: true,
-      template: '<p id="app-progress-msg" class="item-icon-left"><i class="icon ion-loading-c"></i>Fetching records...</p>'
-    });
+    duration: 30000,
+    delay : 400,
+    noBackdrop: true,
+    template: '<p id="app-progress-msg" class="item-icon-left">Fetching records...<ion-spinner/></p>'
+  });
   $scope.table = {'Name': $stateParams.tableName};
   DevService.allRecords($stateParams.tableName, false)
     .then(function(tableRecs) {
@@ -388,8 +387,7 @@ angular.module('starter.controllers', ['ionic'])
   });
 
   $scope.getItemHeight = function(item, index) {
-    // seems to be a good height
-    return 120 + item.length*55;
+    return (typeof(item) != "undefined")  ? 100 + item.length*55 : 0;
   };
 })
 

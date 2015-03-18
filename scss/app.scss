@@ -13,12 +13,23 @@ $button-light-border:		#7fd291;
 //  A P P    S T A R T    P A G E
 #start-page {
   // Could style your apps startpage here.
-  height: 100%;
+  background:
+  // LOGO
+  url('../img/logo.png' ) no-repeat center 50px,
+  #004576;
+  height: 4000px; // needed to display whilst Ionic is initialising
 }
 
 #start-page .card {
   box-shadow: none;
   background-color : transparent;
+  position: absolute;
+  top: 150px;
+}
+
+#start-page .card p{
+  text-align: center;
+  color: #fff;
 }
 
 #start-page .card .item {

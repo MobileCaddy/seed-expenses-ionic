@@ -23,15 +23,17 @@ cd seed-expenses-ionic
 ## What you get (prior to running any installs/grunt tasks)
 
 ```
-├── bower.json        ## Defines dependencies (MobileCaddy, Ionic)
+├── apex-templates		## Templates for the platform's startpage and cache manifest
+├── bower.json        ## Defines dependencies (MobileCaddy, Ionic, etc)
 ├── Gruntfile.js      ## Defines our task automation
 ├── package.json      ## The node package file
 ├── README.md         ## This file
+├── scss              ## Where you do your SCSS
 ├── test              ## Platform mock responses can go in here
 └── www               ## Where you do your coding
     ├── css
     ├── img
-    ├── index.html
+    ├── index.html    ## This is used locally only
     ├── js
     ├── lib
     └── templates
