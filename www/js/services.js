@@ -5,6 +5,74 @@ var underscore = angular.module('underscore', []);
 
 angular.module('starter.services', ['underscore'])
 
+/*
+ * handles network events (online/offline) and kicks off tasks if needed
+ */
+.factory('NetworkService', function(){
+  return {
+    networkEvent: function(status){
+      var pastStatus = localStorage.getItem('networkStatus');
+      if (status == "online" && pastStatus != status) {
+        console.debug('hiya');
+        var devUtils = mobileCaddy.require('mobileCaddy/devUtils');
+        var tab2Sync = ['MC_Time_Expense__ap'];
+        var sequence = Promise.resolve();
+        tab2Sync.forEach(function(table){
+          sequence = sequence.then(function() {
+            return devUtils.syncMobileTable(table, true);
+          });
+        });
+      }
+      localStorage.setItem('networkStatus', status);
+      return true;
+    }
+  };
+})
+
+
+/*
+ * Collects 'resume' event and checks if there's an upgrade available. If so
+ *  then ask the user if they want to upgrade. If not then refrain from
+ *  asking again for a period if time.
+ */
+.factory('AppRunStatusService', function($ionicPopup) {
+  return {
+    statusEvent: function(status){
+      console.debug('appRunStatusCtrl', status);
+      var vsnUtils = mobileCaddy.require('mobileCaddy/vsnUtils');
+      vsnUtils.upgradeAvailable().then(function(res){
+        if (res) {
+          var notificationTimeout = (1000 * 60 * 5); // 5 minutes
+          var prevUpNotification = localStorage.getItem('prevUpNotification');
+          var timeNow = Date.now();
+          if (prevUpNotification === null) {
+            prevUpNotification = 0;
+          }
+          if (parseInt(prevUpNotification) < (timeNow - notificationTimeout)){
+            var confirmPopup = $ionicPopup.confirm({
+              title: 'Upgrade available',
+              template: 'Would you like to upgrade now?',
+              cancelText: 'Not just now',
+              okText: 'Yes'
+            });
+            confirmPopup.then(function(res) {
+              if(res) {
+                localStorage.removeItem('prevUpNotification');
+                vsnUtils.upgradeIfAvailable().then(function(res){
+                  console.debug('upgradeIfAvailable', res);
+                });
+              } else {
+                localStorage.setItem('prevUpNotification', timeNow);
+              }
+            });
+          }
+        }
+      });
+      return true;
+    }
+  };
+})
+
 .factory('ProjectService', function($rootScope, $q, _) {
   var devUtils        = mobileCaddy.require('mobileCaddy/devUtils');
 
@@ -34,71 +102,72 @@ angular.module('starter.services', ['underscore'])
   }
 
   function getProjectsFromSmartStore(action) {
-    var deferred = $q.defer();
-    devUtils.readRecords('MC_Project__ap', []).then(function(resObject) {
-      records = resObject.records;
-      var projects = [];
-      //console.log('Angular: getRecordsFromSmartStore records ->' + angular.toJson(records));
-      console.log('Angular: getRecordsFromSmartStore');
-      projects = records;
-      //console.log('Angular: projects->' + angular.toJson(projects));
-      console.log('Angular: projects');
-      $rootScope.$broadcast('scroll.refreshComplete');
-      switch (action) {
-        case 'back' : window.history.back();
-          break;
-        default : console.log('Angular: getProjectsFromSmartStore, non-handled action');
-      }
-      deferred.resolve(projects);
-    }).catch(function(resObject){
-      console.log('Angular : Error from querySoupRecords -> ' + angular.toJson(resObject));
-      deferred.reject('error');
+    return new Promise(function(resolve, reject) {
+      devUtils.readRecords('MC_Project__ap', []).then(function(resObject) {
+        records = resObject.records;
+        var projects = [];
+        //console.log('Angular: getRecordsFromSmartStore records ->' + angular.toJson(records));
+        console.log('Angular: getRecordsFromSmartStore', resObject);
+        projects = records;
+        //console.log('Angular: projects->' + angular.toJson(projects));
+        console.log('Angular: projects');
+        $rootScope.$broadcast('scroll.refreshComplete');
+        switch (action) {
+          case 'back' : window.history.back();
+            break;
+          default : console.log('Angular: getProjectsFromSmartStore, non-handled action');
+        }
+        console.log(projects);
+        resolve(projects);
+      }).catch(function(resObject){
+        console.log('Angular : Error from querySoupRecords -> ' + angular.toJson(resObject));
+        reject('error');
+      });
     });
-  return deferred.promise;
   }
 
   function getProjects(refreshFlag, localProjCB) {
-    var firstStartUp = (typeof $rootScope.firstStartUp == 'undefined' || $rootScope.firstStartUp === true);
-    var deferred = $q.defer();
-    console.log('Angular: getProjects, firstStartUp ->' + firstStartUp);
-    if (refreshFlag || firstStartUp) {
-      projects = [];
-      if (typeof(localProjCB) != "undefined") {
-        // get localprojects if they exist and return through callback
-        getProjectsFromSmartStore('undefined')
-          .then(function(projects) {
-            localProjCB(projects);
+    return new Promise(function(resolve, reject) {
+      var firstStartUp = (typeof $rootScope.firstStartUp == 'undefined' || $rootScope.firstStartUp === true);
+      console.log('Angular: getProjects, firstStartUp ->' + firstStartUp);
+      if (refreshFlag || firstStartUp) {
+        projects = [];
+        if (typeof(localProjCB) != "undefined") {
+          // get localprojects if they exist and return through callback
+          getProjectsFromSmartStore('undefined')
+            .then(function(projects) {
+              localProjCB(projects);
+          });
+        }
+        devUtils.syncMobileTable('MC_Project__ap').then(function(resObject){
+          console.log('Angular : Success from syncMobileTable -> ' + angular.toJson(resObject));
+          getProjectsFromSmartStore('undefined')
+            .then(function(projects) {
+              resolve(projects);
+              //if (firstStartUp) {
+                syncStartupTables(!refreshFlag);
+              //}
+          }, function(reason) {
+            console.error("Angular: promise returned reason -> " + reason);
+            reject('error');
+          });
+        }).catch(function(resObject){
+            console.error('Angular : Error from syncMobileTable -> ' + angular.toJson(resObject));
+            reject('error');
         });
-      }
-      devUtils.syncMobileTable('MC_Project__ap').then(function(resObject){
-        console.log('Angular : Success from syncMobileTable -> ' + angular.toJson(resObject));
+      } else {
+        // tmp line to set local projects
+        projects = $rootScope.projects;
         getProjectsFromSmartStore('undefined')
           .then(function(projects) {
-            deferred.resolve(projects);
-            //if (firstStartUp) {
-              syncStartupTables(!refreshFlag);
-            //}
+          resolve(projects);
         }, function(reason) {
           console.error("Angular: promise returned reason -> " + reason);
-          deferred.reject('error');
+          reject('error');
         });
-      }).catch(function(resObject){
-          console.error('Angular : Error from syncMobileTable -> ' + angular.toJson(resObject));
-          deferred.reject('error');
-      });
-    } else {
-      // tmp line to set local projects
-      projects = $rootScope.projects;
-      getProjectsFromSmartStore('undefined')
-        .then(function(projects) {
-        deferred.resolve(projects);
-      }, function(reason) {
-        console.error("Angular: promise returned reason -> " + reason);
-        deferred.reject('error');
-      });
-    }
-    $rootScope.firstStartUp = false;
-    return deferred.promise;
+      }
+      $rootScope.firstStartUp = false;
+    });
   }
 
   var locations = [];
@@ -145,36 +214,36 @@ angular.module('starter.services', ['underscore'])
    * @return promise : array of expenses recs
    */
   function getTimeExpense(type, projectId) {
-    console.log('Angular: getTimeExpense');
-    var timeExpense = [];
-    var deferred = $q.defer();
-    devUtils.readRecords('MC_Time_Expense__ap', []).then(function(resObject) {
-      records = resObject.records;
-      $j.each(records, function(i,record) {
-        timeExpense.push(record);
-      });
-      console.log('Angular: timeExpense' + angular.toJson(timeExpense));
-      console.log('Angular: projectId' + projectId);
-      var timeExpense1 =  [];
-      if ( type == "time") {
-        timeExpense1 = timeExpense.filter(function(el){
-          return el.mc_package_002__Duration_Minutes__c !== null &&
-            el.mc_package_002__Project__c == projectId;
+    return new Promise(function(resolve, reject) {
+      console.log('Angular: getTimeExpense');
+      var timeExpense = [];
+      devUtils.readRecords('MC_Time_Expense__ap', []).then(function(resObject) {
+        records = resObject.records;
+        $j.each(records, function(i,record) {
+          timeExpense.push(record);
         });
-        } else {
-        timeExpense1 = timeExpense.filter(function(el){
-          return (el.mc_package_002__Expense_Amount__c !== null && typeof(el.mc_package_002__Expense_Amount__c) != "undefined" ) &&
-            el.mc_package_002__Project__c == projectId;
-        });
-        }
+        console.log('Angular: timeExpense' + angular.toJson(timeExpense));
+        console.log('Angular: projectId' + projectId);
+        var timeExpense1 =  [];
+        if ( type == "time") {
+          timeExpense1 = timeExpense.filter(function(el){
+            return el.mc_package_002__Duration_Minutes__c !== null &&
+              el.mc_package_002__Project__c == projectId;
+          });
+          } else {
+          timeExpense1 = timeExpense.filter(function(el){
+            return (el.mc_package_002__Expense_Amount__c !== null && typeof(el.mc_package_002__Expense_Amount__c) != "undefined" ) &&
+              el.mc_package_002__Project__c == projectId;
+          });
+          }
 
-      console.log('Angular: timeExpense1' + angular.toJson(timeExpense1));
-      deferred.resolve(timeExpense1);
-    }).catch(function(resObject){
-      console.error('Angular : Error from syncMobileTable MC_Project_Location__ap -> ' + angular.toJson(resObject));
-      deferred.reject('error');
+        console.log('Angular: timeExpense1' + angular.toJson(timeExpense1));
+        resolve(timeExpense1);
+      }).catch(function(resObject){
+        console.error('Angular : Error from syncMobileTable MC_Project_Location__ap -> ' + angular.toJson(resObject));
+        reject('error');
+      });
     });
-    return deferred.promise;
   }
 
   return {
@@ -185,16 +254,19 @@ angular.module('starter.services', ['underscore'])
     get: function(projectId) {
       console.log('Angular: projects->' + angular.toJson($rootScope.projects));
       var ProjectArr =  _.where($rootScope.projects, {'Id': projectId});
-      console.log('Angular: project->' + project);
       project = ProjectArr[0];
-      if(typeof ProjectArr[0].mc_package_002__MC_Project_Location__c != 'undefined') {
-        if (locations.length <= 0) {
-          locations =  getLocations(ProjectArr[0].mc_package_002__MC_Project_Location__c);
+      console.log('Angular: project -> ', project);
+      if (typeof(project) != "undefined") {
+        project = ProjectArr[0];
+        if(typeof ProjectArr[0].mc_package_002__MC_Project_Location__c != 'undefined') {
+          if (locations.length <= 0) {
+            locations =  getLocations(ProjectArr[0].mc_package_002__MC_Project_Location__c);
+          }
+          ProjectArr[0].location =  getLocationFromId(ProjectArr[0].mc_package_002__MC_Project_Location__c);
+        } else {
+          console.log('Angular: no mc_package_002__MC_Project_Location__c in project');
+          ProjectArr[0].location = '-';
         }
-        ProjectArr[0].location =  getLocationFromId(ProjectArr[0].mc_package_002__MC_Project_Location__c);
-      } else {
-        console.log('Angular: no mc_package_002__MC_Project_Location__c in project');
-        ProjectArr[0].location = '-';
       }
       return project;
     },
@@ -212,7 +284,7 @@ angular.module('starter.services', ['underscore'])
       return deferred.promise;
     },
     expenses: function(type, projectId) {
-      console.log('Angular: getProject, type=' + type + ', Id=' + projectId);
+      console.log('Angular: expenses, type=' + type + ', Id=' + projectId);
       return  getTimeExpense(type, projectId);
     },
     newExpense: function(varNewExp, success, error) {

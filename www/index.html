@@ -57,7 +57,7 @@
       window.LOCAL_DEV = true;
       // true - use ForceJS lib to authenticate with SF and use platform data
       // false - bypass auth and use mockVFRemote for platform data (see docs)
-      window.USE_FORCETK = true;
+      window.USE_FORCETK = false;
       // set the login url to be used by ForceJS (optinal) - only needed if
       // USE_FORCETK set to true
       window.SF_LOGIN_URL = 'https://login.salesforce.com/';
@@ -86,8 +86,8 @@
       mobileCaddy.dynVersionNumber          = '006';
       mobileCaddy.syncRefreshVersion        = '001';
 
-      SupportMc.singleton.startUp(function() {
-        myapp_callback();
+      SupportMc.singleton.startUp(function(runUpInfo) {
+        myapp_callback(runUpInfo);
       });
     </script>
   </head>
@@ -95,14 +95,14 @@
   <!--
     'starter' is the name of this angular module (js/app.js)
   -->
-  <body animation="slide-left-right-ios7">
+  <body>
 
     <!--
       The nav bar that will be updated as we navigate between views
       Additional attributes set its look, ion-nav-bar animation and icons
       Icons provided by Ionicons: http://ionicons.com/
     -->
-    <ion-nav-bar class="bar-positive" id="my-nav-bar">
+    <ion-nav-bar class="bar-positive mc-hide" id="my-nav-bar">
       <ion-nav-back-button></ion-nav-back-button>
     </ion-nav-bar>
 

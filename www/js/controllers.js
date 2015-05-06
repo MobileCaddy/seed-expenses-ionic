@@ -167,7 +167,7 @@ angular.module('starter.controllers', ['ionic'])
   ===========================================================================
   */
 
-.controller('SettingsHBCtrl', function($scope, $rootScope, DevService) {
+.controller('SettingsHBCtrl', function($scope, $rootScope, DevService, NetworkService) {
 
   if (localStorage.connection) {
     $scope.heartbeatStatus = localStorage.connection;
@@ -177,6 +177,8 @@ angular.module('starter.controllers', ['ionic'])
 
   $scope.hbUpdate = function() {
     localStorage.connection = $scope.heartbeatStatus;
+    if ($scope.heartbeatStatus == 100100) NetworkService.networkEvent('online');
+    if ($scope.heartbeatStatus == 100103) NetworkService.networkEvent('offline');
   };
 
 })
@@ -192,6 +194,12 @@ angular.module('starter.controllers', ['ionic'])
   $scope.recsToSyncCount = 0;
 
   $scope.codeflow = LOCAL_DEV;
+
+  var vsnUtils = mobileCaddy.require('mobileCaddy/vsnUtils');
+  $scope.upgradeAvailable = false;
+  vsnUtils.upgradeAvailable().then(function(res){
+    if (res) $scope.upgradeAvailable = true;
+  });
 
   DevService.allRecords('recsToSync', false)
     .then(function(recsToSyncRecs) {
@@ -242,6 +250,21 @@ angular.module('starter.controllers', ['ionic'])
     return (pword == "123") ?  true : false;
   }
 
+
+  $scope.upgradeIfAvailable = function() {
+    var confirmPopup = $ionicPopup.confirm({
+      title: 'Upgrade',
+      template: 'Are you sure you want to upgrade now?'
+    });
+    confirmPopup.then(function(res) {
+      if(res) {
+        var vsnUtils = mobileCaddy.require('mobileCaddy/vsnUtils');
+        vsnUtils.upgradeIfAvailable().then(function(res){
+          console.debug('upgradeIfAvailable', res);
+        });
+      }
+    });
+  };
 
   /*
   ---------------------------------------------------------------------------
@@ -300,45 +323,35 @@ angular.module('starter.controllers', ['ionic'])
     confirmPopup.then(function(res) {
       if(res) {
         console.debug("Resetting app");
+        var vsnUtils = mobileCaddy.require('mobileCaddy/vsnUtils');
         var i;
         var name;
-        if ( window.location.host == "localhost:3030" ) {
-          // Codeflow emulator
-          for (i = 0; i < localStorage.length; i++) {
-            name = localStorage.key( i );
-            if ( name != 'forceOAuth' ) smartstore.removeSoup(name);
-          }
-          window.location.assign(window.location.protocol + "//" + window.location.host + "/www");
-        } else if ( typeof(mockStore) != "undefined" ) {
-          // Platform emulator
-          for (i = 0; i < localStorage.length; i++) {
-            name = localStorage.key( i );
-            if ( name != 'forceOAuth' )  smartstore.removeSoup(name);
-          }
-          var newUrl = window.location.href.substr(0, window.location.href.indexOf('#'));
-          window.location.assign(newUrl);
-        } else {
-          // Device
-          DevService.allTables().then(function(tables) {
-            smartstore = cordova.require('com.salesforce.plugin.smartstore');
-            tables.forEach(function(table){
-              console.debug("Calling smartstore.removeSoup for " + table.Name);
-              smartstore.removeSoup(table.Name);
-            });
-            aouth = cordova.require('salesforce/plugin/oauth');
-            aouth.getAppHomeUrl(function(homePage) {
-              window.history.go( -( history.length - 1 ) );
-            });
-            //SupportMc.singleton.startUp();
-          }, function(reason) {
-            console.error('Angular: promise returned reason -> ' + reason);
-          });
-
-        }
+        $ionicLoading.show({
+          duration: 30000,
+          delay : 400,
+          maxWidth: 600,
+          noBackdrop: true,
+          template: '<h1>Resetting app...</h1><p id="app-progress-msg" class="item-icon-left">Clearing data...<ion-spinner/></p>'
+        });
+        vsnUtils.hardReset().then(function(res){
+          //$ionicLoading.hide();
+        }).catch(function(e){
+          console.error(e);
+          $ionicLoading.hide();
+        });
       }
     });
   };
 
+})
+
+
+.controller('TestingCtrl', function($scope,AppRunStatusService) {
+
+  $scope.resumeEvent = function() {
+    console.debug("resumeEvent");
+    AppRunStatusService.statusEvent('resume');
+  };
 
 })
 

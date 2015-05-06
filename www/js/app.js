@@ -1,6 +1,32 @@
 
 angular.module('starter', ['ionic', 'starter.services', 'starter.controllers'])
 
+.run(function($ionicPlatform, NetworkService, AppRunStatusService) {
+  $ionicPlatform.ready(function() {
+    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+    // for form inputs)
+    if (window.cordova && window.cordova.plugins && window.cordova.plugins.Keyboard) {
+      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+    }
+    if (window.StatusBar) {
+      // org.apache.cordova.statusbar required
+      StatusBar.styleLightContent();
+    }
+
+    document.addEventListener("resume", function() {
+      AppRunStatusService.statusEvent('resume');
+    }, false);
+    // document.addEventListener("pause", function() {
+    //   AppRunStatusService.statusEvent('pause');
+    // }, false);
+    document.addEventListener("online", function() {
+      NetworkService.networkEvent('online');
+    }, false);
+    document.addEventListener("offline", function() {
+      NetworkService.networkEvent('offline');
+    }, false);
+  });
+})
 
 .config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
   // Ionic uses AngularUI Router which uses the concept of states
@@ -129,6 +155,17 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers'])
 
 });
 
-function myapp_callback() {
-  angular.bootstrap(document, ['starter']);
+// runUpInfo : see http://developer.mobilecaddy.net/docs/api for details on
+// object and codes.
+function myapp_callback(runUpInfo) {
+  if (typeof(runUpInfo) != "undefined" &&
+     (typeof(runUpInfo.newVsn) != "undefined" && runUpInfo.newVsn != runUpInfo.curVsn)) {
+    // Going to call a hardReset as an upgrade is available.
+    console.debug('runUpInfo', runUpInfo);
+    var vsnUtils= mobileCaddy.require('mobileCaddy/vsnUtils');
+    vsnUtils.hardReset();
+  } else {
+    // carry on, nothing to see here
+    angular.bootstrap(document, ['starter']);
+  }
 }
