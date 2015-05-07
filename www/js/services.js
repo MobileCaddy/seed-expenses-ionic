@@ -13,7 +13,6 @@ angular.module('starter.services', ['underscore'])
     networkEvent: function(status){
       var pastStatus = localStorage.getItem('networkStatus');
       if (status == "online" && pastStatus != status) {
-        console.debug('hiya');
         var devUtils = mobileCaddy.require('mobileCaddy/devUtils');
         var tab2Sync = ['MC_Time_Expense__ap'];
         var sequence = Promise.resolve();
