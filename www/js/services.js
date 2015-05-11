@@ -14,7 +14,7 @@ angular.module('starter.services', ['underscore'])
       var pastStatus = localStorage.getItem('networkStatus');
       if (status == "online" && pastStatus != status) {
         var devUtils = mobileCaddy.require('mobileCaddy/devUtils');
-        var tab2Sync = ['MC_Time_Expense__ap'];
+        var tab2Sync = ['MC_Project__ap', 'MC_Time_Expense__ap'];
         var sequence = Promise.resolve();
         tab2Sync.forEach(function(table){
           sequence = sequence.then(function() {
