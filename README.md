@@ -30,7 +30,7 @@ cd seed-expenses-ionic-master
 ├── package.json      ## The node package file
 ├── README.md         ## This file
 ├── scss              ## Where you do your SCSS
-├── tests             ## unit tests etc
+├── tests             ## unit tests / e2e tests etc
 └── www               ## Where you do your coding
     ├── css
     ├── img
@@ -61,3 +61,27 @@ The Grunt config (out of the box) offers the following commands
 * **grunt unit-test** : run the karma unit tests
 * **grunt dev** : This runs JSHint, SASS compilation and will create a .zip file containing your app. You JS will be unminified in this archive to aid debugging.
 * **grunt prod** : This will do the same as **grunt dev** but your JS will be minified in the output archive.
+
+## end2end Testing
+
+e2e tests can be run with protractor. This may need to be installed if you haven't got it already;
+
+```
+npm install -g protractor
+```
+
+You may also need to install/update the webdriver
+
+```
+webdriver-manager update --standaloneUpdating selenium standalone
+```
+
+To run the tests;
+
+```
+webdriver-manager start
+```
+... and in another prompt
+```
+protractor tests/protractor.config.js
+```
