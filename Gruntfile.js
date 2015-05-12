@@ -18,10 +18,7 @@ module.exports = function(grunt) {
       },
       dev: {
         src: ['www/**',
-              // don't include lib files that are needed only for local dev/test
-              '!www/lib/js/*',
-              // add any libs that you do want included here.
-              'www/lib/js/ionic.bundle.min.js',
+              // don't include  files that are needed only for local dev/test
               '!www/index.html',
               '!www/**/*.log'],
         expand: true
@@ -33,10 +30,7 @@ module.exports = function(grunt) {
               'www/**',
               // don't include js that we have minified
               '!www/js/*',
-              // don't include lib files that are needed only for local dev/test
-              '!www/lib/js/*',
               // add any libs that you do want included here.
-              'www/lib/js/ionic.bundle.min.js',
               '!www/index.html',
               '!www/**/*.log'],
             expand: true
@@ -122,19 +116,9 @@ module.exports = function(grunt) {
           {
             expand: true,
             flatten: true,
-            src: ['bower_components/mobilecaddy-codeflow/js/*',
-                  'bower_components/ionic/release/js/ionic.bundle.min.js',
-                  'bower_components/jquery/dist/jquery.min.js',
-                  'bower_components/underscore/underscore-min.js',
-                  'bower_components/signature_pad/signature_pad.min.js',
-                  'bower_components/mobilecaddy-utils/js/mobilecaddy-utils.min.js'],
+            src: ['bower_components/ionic/release/js/ionic.bundle.min.js'],
             dest: 'www/lib/js',
             filter: 'isFile'
-          },
-          // Promises polyfill
-          {
-            src: ['bower_components/es6-promise/index.js'],
-            dest: 'www/lib/js/promise-1.0.0.min.js'
           },
           // Ionic scss
           {
@@ -149,11 +133,6 @@ module.exports = function(grunt) {
             cwd: 'bower_components/ionic/release/fonts/',
             src: ['**'],
             dest: 'www/fonts'
-          },
-          // forcejs
-           {
-            src: ['bower_components/forcejs/force.js'],
-            dest: 'www/lib/js/force.js'
           },
           {
             src: ['bower_components/forcejs/oauthcallback.html'],
