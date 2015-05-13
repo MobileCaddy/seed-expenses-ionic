@@ -28,7 +28,7 @@ describe("Projects", function() {
   it("should have detailed project view", function() {
     var projects = element.all(by.binding('project.Name'));
     projects.get(0).click();
-    browser.sleep(3000);
+    browser.sleep(800);
     expect(browser.getTitle()).toContain('Collect Bus');
     expect(element(by.model('project.formDescription')).getAttribute('value')).toContain('Justin would');
     expect(element(by.binding('project.location')).getText()).toContain('Client');
@@ -37,7 +37,7 @@ describe("Projects", function() {
 
   it("should have time entries list with 2 items", function() {
     element.all(by.css('.item-icon-left')).get(1).click();
-    browser.sleep(1000);
+    browser.sleep(800);
     expect(browser.getTitle()).toEqual('Timesheets');
     var timesheets = element.all(by.repeater('record in expenses'));
     expect(timesheets.count()).toEqual(2);
@@ -49,9 +49,9 @@ describe("Projects", function() {
 
 
   it("should have expense entries list with 1 item", function() {
-    browser.sleep(1000);
+    browser.sleep(500);
     element.all(by.css('.item-icon-left')).get(2).click();
-    browser.sleep(1000);
+    browser.sleep(800);
     expect(browser.getTitle()).toEqual('Expenses');
     var timesheets = element.all(by.repeater('record in expenses'));
     expect(timesheets.count()).toEqual(1);
@@ -63,9 +63,9 @@ describe("Projects", function() {
 
 
   it("should have a new expense screen", function() {
-    browser.sleep(2000);
-    element.all(by.css('.button-block')).get(1).click();
     browser.sleep(1000);
+    element.all(by.css('.button-block')).get(1).click();
+    browser.sleep(800);
     expect(browser.getTitle()).toEqual('New Timesheet');
     var subBtn = element(by.css('.button-positive'));
     expect(subBtn.isEnabled()).toEqual(false);
@@ -79,7 +79,7 @@ describe("Projects", function() {
   });
 
   it("should have enabled submit when valid input", function() {
-    browser.sleep(1000);
+    browser.sleep(500);
     element.all(by.css('.button-block')).get(1).click();
     browser.sleep(500);
     var subBtn =  element(by.css('.submit-expense'));
@@ -91,10 +91,10 @@ describe("Projects", function() {
     subBtn.click();
   });
 
-  it("should have time entries list with 2 items", function() {
-    browser.sleep(1000);
+  it("should have time entries list with 3 items", function() {
+    browser.sleep(800);
     element.all(by.css('.item-icon-left')).get(1).click();
-    browser.sleep(1000);
+    browser.sleep(800);
     expect(browser.getTitle()).toEqual('Timesheets');
     var timesheets = element.all(by.repeater('record in expenses'));
     expect(timesheets.count()).toEqual(3);
