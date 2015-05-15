@@ -21,5 +21,8 @@ exports.config = {
 
 				  // for non-angular page
 				  browser.ignoreSynchronization = true;
+
+          // add protractor-ionic-locator
+          require('protractor-ionic-locator')(protractor);
         }
 };

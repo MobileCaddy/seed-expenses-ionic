@@ -8,7 +8,7 @@ describe("Projects", function() {
       expect(title).toEqual("Ionic Time & Expenses Demo App");
     	browser.sleep(3000);
       expect(browser.getTitle()).toEqual("Projects");
-      var projects = element.all(by.binding('project.Name'));
+      var projects = element.all(by.collRepeater('project in projects'));
       expect(projects.first().getText()).toContain('Collect Bus');
       expect(projects.get(6).getText()).toEqual('');
     });
