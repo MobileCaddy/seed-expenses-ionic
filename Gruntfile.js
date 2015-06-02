@@ -74,6 +74,17 @@ module.exports = function(grunt) {
       }
     },
 
+    express: {
+      options: {
+        // Override defaults here
+      },
+      dev: {
+        options: {
+          script: 'cors/cors-server.js'
+        }
+      }
+    },
+
     sass: {
       dist: {
         options: {
@@ -107,6 +118,10 @@ module.exports = function(grunt) {
         options: {
           livereload: true,
         },
+      express: {
+        files: ['cors/cors-server.js'],
+        tasks:  [ 'express:dev' ]
+      }
       }
     },
 
@@ -163,7 +178,7 @@ module.exports = function(grunt) {
   });
   // Each plugin must be loaded following this pattern
   grunt.registerTask('devsetup', ['copy:devsetup', 'sass', 'replace']);
-  grunt.registerTask('serve', ['connect', 'watch']);
+  grunt.registerTask('serve', ['connect', 'express:dev', 'watch']);
   grunt.registerTask('dev', ['jshint:myFiles', 'compress:dev']);
   grunt.registerTask('unit-test', ['karma']);
   grunt.registerTask('prod', ['jshint:myFiles', 'uglify', 'compress:prod']);
