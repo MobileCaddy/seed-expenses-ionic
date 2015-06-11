@@ -60,7 +60,7 @@
       // true - use ForceJS lib to authenticate with SF and use platform data
       // false - bypass auth and use mockVFRemote for platform data (see docs)
       // This can be overwritten by grunt /  mobilecaddy command line arg (i.e. --local)
-      window.USE_FORCETK = false;
+      window.USE_FORCETK = true;
       var queryString= [];
       var hash;
       var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');

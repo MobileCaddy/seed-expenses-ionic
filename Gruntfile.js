@@ -15,6 +15,11 @@ module.exports = function(grunt) {
     qStr += "?" + scrub + "&" + local;
   }
 
+  var expressArgs = [];
+  if (grunt.option('rec')){
+    expressArgs.push('rec');
+  }
+
   require('load-grunt-tasks')(grunt);
   // Project configuration.
   grunt.initConfig({
@@ -94,6 +99,7 @@ module.exports = function(grunt) {
       },
       dev: {
         options: {
+          args: expressArgs,
           script: 'cors/cors-server.js'
         }
       }
