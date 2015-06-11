@@ -1,6 +1,20 @@
 module.exports = function(grunt) {
   "use strict";
 
+  var qStr = "";
+  var scrub = "";
+  if (grunt.option('scrub')){
+    scrub = 'scrub=' + grunt.option('scrub');
+  }
+  var local = "";
+  if (grunt.option('local')){
+    local= 'local=true';
+  }
+
+  if (scrub !== "" || local !== ""){
+    qStr += "?" + scrub + "&" + local;
+  }
+
   require('load-grunt-tasks')(grunt);
   // Project configuration.
   grunt.initConfig({
@@ -69,7 +83,7 @@ module.exports = function(grunt) {
         options: {
           port: 3030,
           livereload: true,
-          open: "http://localhost:3030/www"
+          open: "http://localhost:3030/www" + qStr
         }
       }
     },
@@ -117,11 +131,11 @@ module.exports = function(grunt) {
         tasks: [],
         options: {
           livereload: true,
-        },
+        }
+      },
       express: {
         files: ['cors/cors-server.js'],
         tasks:  [ 'express:dev' ]
-      }
       }
     },
 
