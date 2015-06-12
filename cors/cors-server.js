@@ -52,8 +52,11 @@ function recordResponse(req, response, body){
                 fName = "getDefsForSObjectMobileTables.json"
                 break;
             case "p2mRefreshTable001" :
-                fPath2 = p2mPath;
-                fName = req.body.mobileTableName + ".json";
+                if (req.body.lastRefreshDateTime == 0){
+                    // only update mocks if it's the first response.
+                    fPath2 = p2mPath;
+                    fName = req.body.mobileTableName + ".json";
+                }
                 break;
             default:
                 fName = "";
