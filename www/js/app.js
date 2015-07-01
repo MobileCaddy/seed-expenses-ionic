@@ -16,9 +16,6 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers'])
     document.addEventListener("resume", function() {
       AppRunStatusService.statusEvent('resume');
     }, false);
-    // document.addEventListener("pause", function() {
-    //   AppRunStatusService.statusEvent('pause');
-    // }, false);
     document.addEventListener("online", function() {
       NetworkService.networkEvent('online');
     }, false);

@@ -41,7 +41,7 @@ cd seed-expenses-ionic-master
 
 ```
 
-* Install the required packages and dependencies (not you might need `sudo npm install` below)
+* Install the required packages and dependencies (note. you might need `sudo npm install` below)
 
 ```
 npm install

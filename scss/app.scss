@@ -59,3 +59,14 @@ a.disabled {
    cursor: default;
    color: grey;
 }
+
+.search-input {
+  margin-right: 0px !important;
+}
+
+.search-clear-button {
+  position: absolute;
+  right: 0;
+  top: 0px;
+  color: #bbb;
+}

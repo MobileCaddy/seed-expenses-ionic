@@ -16,7 +16,7 @@
     "tests"
   ],
   "devDependencies": {
-    "ionic": "1.0.0-rc.5",
+    "ionic": "1.0.0",
     "mobilecaddy-codeflow": "https://github.com/MobileCaddy/codeflow/archive/unstable-0.0.1-alpha.5.zip",
     "mobilecaddy-utils": "https://github.com/MobileCaddy/mobilecaddy-utils/archive/unstable-0.0.1-alpha.6.zip",
     "jszip": "Stuk/jszip#~2.4.0",

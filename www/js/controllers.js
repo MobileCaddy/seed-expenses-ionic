@@ -1,11 +1,16 @@
 angular.module('starter.controllers', ['ionic'])
 
-.controller('ProjectIndexCtrl', function($scope, $rootScope, $ionicLoading, ProjectService) {
+.controller('ProjectIndexCtrl', ['$scope', '$rootScope', '$ionicLoading', 'ProjectService', function($scope, $rootScope, $ionicLoading, ProjectService) {
 
   // This unhides the nav-bar. The navbar is hidden in the cases where we want a
   // splash screen, such as in this app
   e = document.getElementById('my-nav-bar');
   angular.element(e).removeClass( "mc-hide" );
+
+  // Set height of list scrollable area
+  var winHeight = window.innerHeight - 125;
+  var storesList = document.getElementById('project-list');
+  storesList.setAttribute("style","height:" + winHeight + "px");
 
   // Setup the loader and starting templates
   if (typeof($rootScope.child) == "undefined") {
@@ -18,34 +23,35 @@ angular.module('starter.controllers', ['ionic'])
     });
   }
 
-  var localProjCB = function(localProjects) {
-    $rootScope.projects = localProjects;
-    console.log('Angular: localProjCB, got projects with arr len', localProjects.length);
-    if (localProjects.length > 0) $ionicLoading.hide();
-  };
-
-  ProjectService.all($rootScope.refreshFlag, localProjCB).then(function(projects) {
+  ProjectService.all($rootScope.refreshFlag).then(function(projects) {
     $rootScope.projects = projects;
-    console.log('Angular: ProjectIndexCtrl, got projects');
+    //console.log('Angular: ProjectIndexCtrl, got projects');
     $ionicLoading.hide();
   }, function(reason) {
-    console.log('Angular: promise returned reason -> ' + reason);
+    //console.log('Angular: promise returned reason -> ' + reason);
   });
   $rootScope.refreshFlag = false;
 
   $scope.doRefresh = function() {
-  	console.log('Angular: doRefresh');
+  	//console.log('Angular: doRefresh');
   	ProjectService.all(true).then(function(projects) {
       $rootScope.projects = projects;
-      console.log('Angular: ProjectIndexCtrl, projects -> ' + angular.toJson($rootScope.projects));
+      //console.log('Angular: ProjectIndexCtrl, projects -> ' + angular.toJson($rootScope.projects));
     }, function(reason) {
-      console.log('Angular: promise returned reason -> ' + reason);
+      //console.log('Angular: promise returned reason -> ' + reason);
     });
   };
-})
 
+  $scope.search = {};
 
-.controller('ProjectDetailCtrl', function($scope, $rootScope, $stateParams, $location, $ionicLoading,  ProjectService) {
+  $scope.clearSearch = function() {
+    $scope.search.query = "";
+  };
+
+}])
+
+.controller('ProjectDetailCtrl', ['$scope', '$rootScope', '$stateParams', '$location', '$ionicLoading', 'ProjectService', function($scope, $rootScope, $stateParams, $location, $ionicLoading,  ProjectService) {
+
   $scope.project = ProjectService.get($stateParams.projectId);
   $scope.project.formDescription = $scope.project.mc_package_002__Description__c;
 
@@ -62,11 +68,7 @@ angular.module('starter.controllers', ['ionic'])
    * the MC object and call the update.
    */
   $scope.submitForm = function() {
-    console.log('Angular: submitForm');
-    var newProj = {};
-    newProj.Id = $scope.project.Id;
-    newProj.mc_package_002__Description__c  = $scope.project.formDescription;
-    console.log('Angular: update, project -> ' + angular.toJson(newProj));
+    //console.log('Angular: submitForm');
     $ionicLoading.show({
       template: '<h1>Saving...</h1><p>Saving project...</p><i class="icon ion-loading-b" style="font-size: 32px"></i>',
       animation: 'fade-in',
@@ -74,8 +76,13 @@ angular.module('starter.controllers', ['ionic'])
       maxWidth: 600,
       duration: 30000
     });
+    var newProj = {};
+    newProj.Id = $scope.project.Id;
+    newProj.mc_package_002__Description__c  = $scope.project.formDescription;
+    //console.log('Angular: update, project -> ' + angular.toJson(newProj));
     ProjectService.update(newProj).then(function(retObject) {
-      console.log('Angular: update, retObject -> ' + angular.toJson(retObject));
+      //console.log('Angular: update, retObject -> ' + angular.toJson(retObject));
+      // Call with local callback function so project list is displayed quickly while background sync continues
       return ProjectService.all(true, localProjCB);
     }).then(function(projects) {
         $rootScope.projects = projects;
@@ -86,34 +93,36 @@ angular.module('starter.controllers', ['ionic'])
       $ionicLoading.hide();
     }); // end update error callback
   };
-})
 
-.controller('ProjectExpenseCtrl', function($scope, $stateParams, ProjectService) {
-  console.log('Angular : ProjectExpenseCtrl, projectId ->' + $stateParams.projectId);
+}])
+
+.controller('ProjectExpenseCtrl', ['$scope', '$stateParams', 'ProjectService', function($scope, $stateParams, ProjectService) {
+
+  //console.log('Angular : ProjectExpenseCtrl, projectId ->' + $stateParams.projectId);
   switch ($stateParams.type) {
-      case 'time' : $scope.recordType = "Timesheets";
+      case 'time' : $scope.paramType = "Timesheets";
         break;
-      default :  $scope.recordType = 'Expenses';
+      default :  $scope.paramType = 'Expenses';
     }
+
   ProjectService.expenses($stateParams.type, $stateParams.projectId).then(function(timesheets) {
     $scope.expenses = timesheets;
-    console.log('Angular: ProjectExpenseCtrl -> ' + angular.toJson($scope.expenses ));
+    //console.log('Angular: ProjectExpenseCtrl -> ' + angular.toJson($scope.expenses ));
   }, function(reason) {
     console.error('Angular: promise returned error, reason -> ' + reason);
   });
-})
 
+}])
 
-
-.controller('ProjectExpNewCtrl', function($scope, $stateParams, $ionicLoading, $ionicPopup, $ionicModal, ProjectService) {
+.controller('ProjectExpNewCtrl', ['$scope', '$stateParams', '$ionicLoading', '$ionicPopup', '$ionicModal', 'ProjectService', function($scope, $stateParams, $ionicLoading, $ionicPopup, $ionicModal, ProjectService) {
 
   switch ($stateParams.type) {
       case 'time' :
-        $scope.recordType = "Timesheet";
+        $scope.paramType = "Timesheet";
         valueFieldName = "mc_package_002__Duration_Minutes__c";
         break;
       default :
-        $scope.recordType = 'Expense';
+        $scope.paramType = 'Expense';
         valueFieldName = "mc_package_002__Expense_Amount__c";
     }
   $scope.projectId = $stateParams.projectId;
@@ -135,7 +144,7 @@ angular.module('starter.controllers', ['ionic'])
       default :
         varNewExp.mc_package_002__Expense_Amount__c = $scope.expenseForm.expenseValue.$modelValue;
     }
-    console.log('Angular: ProjectExpNewCtrl, varNewExp -> ' + angular.toJson(varNewExp));
+    //console.log('Angular: ProjectExpNewCtrl, varNewExp -> ' + angular.toJson(varNewExp));
     $ionicLoading.show({
       duration: 30000,
       delay : 400,
@@ -145,7 +154,7 @@ angular.module('starter.controllers', ['ionic'])
     });
     ProjectService.newExpense(varNewExp,
       function(){
-        console.log('Angular: ProjectExpNewCtrl, success');
+        //console.log('Angular: ProjectExpNewCtrl, success');
         $ionicLoading.hide();
         window.history.back();
       },
@@ -159,7 +168,7 @@ angular.module('starter.controllers', ['ionic'])
       });
   };
 
-})
+}])
 
  /*
   ===========================================================================
@@ -167,7 +176,7 @@ angular.module('starter.controllers', ['ionic'])
   ===========================================================================
   */
 
-.controller('SettingsHBCtrl', function($scope, $rootScope, DevService, NetworkService) {
+.controller('SettingsHBCtrl', ['$scope', '$rootScope', 'DevService', 'NetworkService', function($scope, $rootScope, DevService, NetworkService) {
 
   if (localStorage.connection) {
     $scope.heartbeatStatus = localStorage.connection;
@@ -181,9 +190,9 @@ angular.module('starter.controllers', ['ionic'])
     if ($scope.heartbeatStatus == 100103) NetworkService.networkEvent('offline');
   };
 
-})
+}])
 
-  .controller('SettingsCtrl', function($scope, $rootScope, $ionicPopup, $ionicLoading, $location, DevService, ProjectService) {
+.controller('SettingsCtrl', ['$scope', '$rootScope', '$ionicPopup', '$ionicLoading', '$location', 'DevService', 'ProjectService', function($scope, $rootScope, $ionicPopup, $ionicLoading, $location, DevService, ProjectService) {
 
   /*
   ---------------------------------------------------------------------------
@@ -260,7 +269,7 @@ angular.module('starter.controllers', ['ionic'])
       if(res) {
         var vsnUtils = mobileCaddy.require('mobileCaddy/vsnUtils');
         vsnUtils.upgradeIfAvailable().then(function(res){
-          console.debug('upgradeIfAvailable', res);
+          //console.log('upgradeIfAvailable', res);
         });
       }
     });
@@ -291,9 +300,8 @@ angular.module('starter.controllers', ['ionic'])
             if (validateAdminPassword($scope.data.admin)) {
                 $location.path('tab/settings/devtools');
                 $rootScope.adminLoggedIn = Date.now();
-                $scope.$apply();
               } else {
-                console.log("Password incorrect");
+                //console.log("Password incorrect");
               }
             }
           },
@@ -322,7 +330,7 @@ angular.module('starter.controllers', ['ionic'])
     });
     confirmPopup.then(function(res) {
       if(res) {
-        console.debug("Resetting app");
+        //console.log("Resetting app");
         var vsnUtils = mobileCaddy.require('mobileCaddy/vsnUtils');
         var i;
         var name;
@@ -343,24 +351,24 @@ angular.module('starter.controllers', ['ionic'])
     });
   };
 
-})
+}])
 
 
-.controller('TestingCtrl', function($scope,AppRunStatusService) {
+.controller('TestingCtrl', ['$scope', 'AppRunStatusService', function($scope, AppRunStatusService) {
 
   $scope.resumeEvent = function() {
-    console.debug("resumeEvent");
+    //console.log("resumeEvent");
     AppRunStatusService.statusEvent('resume');
   };
 
-})
+}])
 
 /*
 ---------------------------------------------------------------------------
   MTI (Mobile Table Inspector)
 ---------------------------------------------------------------------------
 */
-.controller('MTICtrl', function($scope, $rootScope, $location, $ionicPopup, DevService) {
+.controller('MTICtrl', ['$scope', '$rootScope', '$location', '$ionicPopup', 'DevService', function($scope, $rootScope, $location, $ionicPopup, DevService) {
 
   var adminTimeout = (1000 * 60 *5 ); // 5 minutes
   if ( $rootScope.adminLoggedIn > Date.now() - adminTimeout) {
@@ -381,9 +389,9 @@ angular.module('starter.controllers', ['ionic'])
     console.error('Angular: promise returned reason -> ' + reason);
   });
 
-})
+}])
 
-.controller('MTIDetailCtrl', function($scope, $rootScope,$stateParams, $ionicLoading, DevService) {
+.controller('MTIDetailCtrl', ['$scope', '$rootScope', '$stateParams', '$ionicLoading', 'DevService', function($scope, $rootScope,$stateParams, $ionicLoading, DevService) {
   $ionicLoading.show({
     duration: 30000,
     delay : 400,
@@ -402,7 +410,7 @@ angular.module('starter.controllers', ['ionic'])
   $scope.getItemHeight = function(item, index) {
     return (typeof(item) != "undefined")  ? 100 + item.length*55 : 0;
   };
-})
+}])
 
 
 /*
@@ -410,7 +418,7 @@ angular.module('starter.controllers', ['ionic'])
   Deploy Control
 ---------------------------------------------------------------------------
 */
-.controller('DeployCtrl', function($scope, $rootScope, DeployService) {
+.controller('DeployCtrl', ['$scope', '$rootScope', 'DeployService', function($scope, $rootScope, DeployService) {
 
   function iconForErr(errType) {
     switch(errType) {
@@ -427,7 +435,7 @@ angular.module('starter.controllers', ['ionic'])
   $scope.messages = messages;
 
   DeployService.getDetails().then(function(data){
-    console.log('data', data);
+    //console.log('data', data);
     appConfig = data;
     return DeployService.deployBunlde(appConfig);
   }).then(function(res){
@@ -465,6 +473,6 @@ angular.module('starter.controllers', ['ionic'])
         $scope.messages.push(msg);
       }
     });
-    console.debug(err);
+    //console.log(err);
   });
-});
+}]);
