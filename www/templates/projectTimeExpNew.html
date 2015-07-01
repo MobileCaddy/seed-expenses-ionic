@@ -1,4 +1,7 @@
-<ion-view title="New {{paramType}}">
+<ion-view hide-tabs hide-back-button="true">
+  <ion-nav-title>
+    New {{paramType}}
+  </ion-nav-title>
   <ion-content padding="true">
     <form name="expenseForm" ng-controller="ProjectExpNewCtrl" ng-submit="submitForm()">
       <div class="list">
@@ -29,7 +32,7 @@
         <div class="col">
           <button
             ng-disabled="expenseForm.$invalid"
-            class="button-full button icon-left ion-checkmark button-positive submit-expense" >Submit</button>
+            class="button-full button icon-left ion-checkmark button-positive submit-expense">Submit</button>
         </div>
         <div class="col">
           <a class="button-full button icon-left ion-close button-assertive" href="#/tab/project/{{projectId}}">Cancel</a>

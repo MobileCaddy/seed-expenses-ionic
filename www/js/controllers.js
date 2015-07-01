@@ -1,5 +1,10 @@
 angular.module('starter.controllers', ['ionic'])
 
+/*
+===========================================================================
+  ProjectIndexCtrl
+===========================================================================
+*/
 .controller('ProjectIndexCtrl', ['$scope', '$rootScope', '$ionicLoading', 'ProjectService', function($scope, $rootScope, $ionicLoading, ProjectService) {
 
   // This unhides the nav-bar. The navbar is hidden in the cases where we want a
@@ -50,10 +55,39 @@ angular.module('starter.controllers', ['ionic'])
 
 }])
 
+/*
+===========================================================================
+  ProjectDetailCtrl
+===========================================================================
+*/
 .controller('ProjectDetailCtrl', ['$scope', '$rootScope', '$stateParams', '$location', '$ionicLoading', 'ProjectService', function($scope, $rootScope, $stateParams, $location, $ionicLoading,  ProjectService) {
+
+  // Listen for event broadcast when new Time/Expense created
+  var unregisterEvent =  $rootScope.$on('handleRefreshProjectTotals', function(event) {
+    getProjectTotals();
+  });
+
+  // Unregister the event listener when the current scope is destroyed
+  $scope.$on('$destroy', function() {
+    unregisterEvent();
+  });
 
   $scope.project = ProjectService.get($stateParams.projectId);
   $scope.project.formDescription = $scope.project.mc_package_002__Description__c;
+
+  getProjectTotals();
+
+  function getProjectTotals() {
+    // Calculate the total Time and Expense values displayed on the project details
+    ProjectService.getProjectTotals($stateParams.projectId).then(function(retObject) {
+      $scope.totalExpense = retObject.totalExpense;
+      $scope.hours = Math.floor(retObject.totalTime / 60);
+      $scope.minutes = retObject.totalTime % 60;
+      $scope.$apply();
+    }).catch(function(returnErr) {
+      console.error('Angular: update,  returnErr ->' + angular.toJson(returnErr));
+    });
+  }
 
   var localProjCB = function(localProjects) {
     if (localProjects.length > 0) {
@@ -91,11 +125,16 @@ angular.module('starter.controllers', ['ionic'])
     }).catch(function(returnErr) {
       console.error('Angular: update,  returnErr ->' + angular.toJson(returnErr));
       $ionicLoading.hide();
-    }); // end update error callback
+    });
   };
 
 }])
 
+/*
+===========================================================================
+  ProjectExpenseCtrl - list of Times or Expenses
+===========================================================================
+*/
 .controller('ProjectExpenseCtrl', ['$scope', '$stateParams', 'ProjectService', function($scope, $stateParams, ProjectService) {
 
   //console.log('Angular : ProjectExpenseCtrl, projectId ->' + $stateParams.projectId);
@@ -114,16 +153,19 @@ angular.module('starter.controllers', ['ionic'])
 
 }])
 
-.controller('ProjectExpNewCtrl', ['$scope', '$stateParams', '$ionicLoading', '$ionicPopup', '$ionicModal', 'ProjectService', function($scope, $stateParams, $ionicLoading, $ionicPopup, $ionicModal, ProjectService) {
+/*
+===========================================================================
+  ProjectExpNewCtrl - New Time or Expense
+===========================================================================
+*/
+.controller('ProjectExpNewCtrl', ['$scope', '$rootScope', '$stateParams', '$ionicLoading', '$ionicPopup', '$ionicModal', '$location', 'ProjectService', function($scope, $rootScope, $stateParams, $ionicLoading, $ionicPopup, $ionicModal, $location, ProjectService) {
 
   switch ($stateParams.type) {
       case 'time' :
         $scope.paramType = "Timesheet";
-        valueFieldName = "mc_package_002__Duration_Minutes__c";
         break;
       default :
         $scope.paramType = 'Expense';
-        valueFieldName = "mc_package_002__Expense_Amount__c";
     }
   $scope.projectId = $stateParams.projectId;
   $scope.description = "";
@@ -154,9 +196,9 @@ angular.module('starter.controllers', ['ionic'])
     });
     ProjectService.newExpense(varNewExp,
       function(){
-        //console.log('Angular: ProjectExpNewCtrl, success');
         $ionicLoading.hide();
-        window.history.back();
+        $rootScope.$broadcast('refreshProjectTotals');
+        $location.path("/tab/project/" + $stateParams.projectId);
       },
       function(e) {
         console.error('Angular: ProjectExpNewCtrl, error', e);
@@ -475,4 +517,26 @@ angular.module('starter.controllers', ['ionic'])
     });
     //console.log(err);
   });
-}]);
+}])
+
+/*
+===========================================================================
+  D I R E C T I V E S
+===========================================================================
+*/
+
+// hide-tabs
+// Usage: add hide-tabs to ion-view on page you want to hide tabs.
+// (tabsMain.html references $rootScope.hideTabs)
+.directive('hideTabs', function($rootScope) {
+  return {
+      restrict: 'A',
+      link: function($scope, $el) {
+          $rootScope.hideTabs = 'tabs-item-hide';
+          $scope.$on('$destroy', function() {
+            $rootScope.hideTabs = '';
+          });
+      }
+  };
+})
+;

@@ -1,7 +1,7 @@
 
 angular.module('starter', ['ionic', 'starter.services', 'starter.controllers'])
 
-.run(function($ionicPlatform, NetworkService, AppRunStatusService) {
+.run(function($ionicPlatform, $rootScope, NetworkService, AppRunStatusService) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -22,6 +22,16 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers'])
     document.addEventListener("offline", function() {
       NetworkService.networkEvent('offline');
     }, false);
+
+    // Example of locking the screen orientation to landscape
+    // if (screen && screen.lockOrientation) {
+    //   screen.lockOrientation('landscape');
+    // }
+  });
+
+  // handle refresh of project time/expense totals after new time/expense added
+  $rootScope.$on('refreshProjectTotals', function(event, args) {
+      $rootScope.$broadcast('handleRefreshProjectTotals');
   });
 })
 

@@ -343,23 +343,53 @@ angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smart
         //console.log('Angular: timeExpense' + angular.toJson(timeExpense));
         //console.log('Angular: projectId' + projectId);
         var timeExpense1 =  [];
-        if ( type == "time") {
+        if (type == "time") {
           timeExpense1 = timeExpense.filter(function(el){
-            return el.mc_package_002__Duration_Minutes__c !== null &&
-              el.mc_package_002__Project__c == projectId;
+            return (el.mc_package_002__Duration_Minutes__c !== null &&
+                    typeof(el.mc_package_002__Duration_Minutes__c) != "undefined") &&
+                    el.mc_package_002__Project__c == projectId;
           });
-          } else {
+        } else {
           timeExpense1 = timeExpense.filter(function(el){
-            return (el.mc_package_002__Expense_Amount__c !== null && typeof(el.mc_package_002__Expense_Amount__c) != "undefined" ) &&
-              el.mc_package_002__Project__c == projectId;
+            return (el.mc_package_002__Expense_Amount__c !== null &&
+                    typeof(el.mc_package_002__Expense_Amount__c) != "undefined") &&
+                    el.mc_package_002__Project__c == projectId;
           });
-          }
+        }
 
         //console.log('Angular: timeExpense1' + angular.toJson(timeExpense1));
         resolve(timeExpense1);
       }).catch(function(resObject){
         console.error('Angular : Error from readRecords MC_Time_Expense__ap -> ' + angular.toJson(resObject));
         reject('error');
+      });
+    });
+  }
+
+  function getProjectTotals(projectId) {
+    return new Promise(function(resolve, reject) {
+      //console.log('Angular: getProjectTotals',projectId);
+      var totalExpense = 0;
+      var totalTime = 0;
+      devUtils.readRecords('MC_Time_Expense__ap', []).then(function(resObject) {
+        var records = _.where(resObject.records, {'mc_package_002__Project__c': projectId});
+        //console.log('Angular: getProjectTotals',records);
+        _.each(records, function(el) {
+          if (el.mc_package_002__Duration_Minutes__c !== null &&
+              typeof(el.mc_package_002__Duration_Minutes__c) != "undefined") {
+            totalTime += el.mc_package_002__Duration_Minutes__c;
+          } else {
+            if (el.mc_package_002__Expense_Amount__c !== null &&
+                typeof(el.mc_package_002__Expense_Amount__c) != "undefined") {
+              totalExpense += el.mc_package_002__Expense_Amount__c;
+            }
+          }
+        });
+        var result = {"totalExpense": totalExpense, "totalTime": totalTime};
+        resolve(result);
+      }).catch(function(resObject){
+        console.error('Error from readRecords', angular.toJson(resObject));
+        reject(resObject);
       });
     });
   }
@@ -416,6 +446,9 @@ angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smart
         //console.log('Angular: newExpense,  error=' + e);
         error(e);
       });
+    },
+    getProjectTotals: function(projectId) {
+      return getProjectTotals(projectId);
     }
   };
 }])
