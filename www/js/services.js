@@ -1,22 +1,22 @@
-var underscore = angular.module('underscore', []);
-  underscore.factory('_', function() {
+angular.module('underscore', [])
+  .factory('_', function() {
     return window._; // assumes underscore has already been loaded on the page
-  });
+});
 
-var devUtils = angular.module('devUtils', []);
-  devUtils.factory('devUtils', function() {
+angular.module('devUtils', [])
+  .factory('devUtils', function() {
     return mobileCaddy.require('mobileCaddy/devUtils');
-  });
+});
 
-var vsnUtils = angular.module('vsnUtils', []);
-  vsnUtils.factory('vsnUtils', function() {
+angular.module('vsnUtils', [])
+  .factory('vsnUtils', function() {
     return mobileCaddy.require('mobileCaddy/vsnUtils');
-  });
+});
 
-var smartStoreUtils = angular.module('smartStoreUtils', []);
-  smartStoreUtils.factory('smartStoreUtils', function() {
+angular.module('smartStoreUtils', [])
+  .factory('smartStoreUtils', function() {
     return mobileCaddy.require('mobileCaddy/smartStoreUtils');
-  });
+});
 
 angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smartStoreUtils'])
 

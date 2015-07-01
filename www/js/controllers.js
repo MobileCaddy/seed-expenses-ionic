@@ -94,7 +94,7 @@ angular.module('starter.controllers', ['ionic'])
       $rootScope.projects = localProjects;
       $ionicLoading.hide();
       $location.path('/projects');
-      }
+    }
   };
 
   /*
@@ -176,8 +176,8 @@ angular.module('starter.controllers', ['ionic'])
   $scope.submitForm = function() {
     varNewExp = {
       "mc_package_002__Short_Description__c": $scope.expenseForm.description.$modelValue,
-      "Name"       : 'TMP-' + Date.now(),
-      "mc_package_002__Project__c" : $stateParams.projectId
+      "Name": 'TMP-' + Date.now(),
+      "mc_package_002__Project__c": $stateParams.projectId
     };
     switch ($stateParams.type) {
       case 'time' :
@@ -234,7 +234,7 @@ angular.module('starter.controllers', ['ionic'])
 
 }])
 
-.controller('SettingsCtrl', ['$scope', '$rootScope', '$ionicPopup', '$ionicLoading', '$location', 'DevService', 'ProjectService', function($scope, $rootScope, $ionicPopup, $ionicLoading, $location, DevService, ProjectService) {
+.controller('SettingsCtrl', ['$scope', '$rootScope', '$ionicPopup', '$ionicLoading', '$location', 'devUtils', 'vsnUtils', 'DevService', 'ProjectService', function($scope, $rootScope, $ionicPopup, $ionicLoading, $location, devUtils, vsnUtils, DevService, ProjectService) {
 
   /*
   ---------------------------------------------------------------------------
@@ -246,10 +246,14 @@ angular.module('starter.controllers', ['ionic'])
 
   $scope.codeflow = LOCAL_DEV;
 
-  var vsnUtils = mobileCaddy.require('mobileCaddy/vsnUtils');
   $scope.upgradeAvailable = false;
   vsnUtils.upgradeAvailable().then(function(res){
-    if (res) $scope.upgradeAvailable = true;
+    if (res)  return devUtils.dirtyTables();
+  }).then(function(tables){
+    if (tables && tables.length === 0) {
+      $scope.upgradeAvailable = true;
+      $scope.$apply();
+    }
   });
 
   DevService.allRecords('recsToSync', false)
@@ -301,17 +305,45 @@ angular.module('starter.controllers', ['ionic'])
     return (pword == "123") ?  true : false;
   }
 
-
   $scope.upgradeIfAvailable = function() {
-    var confirmPopup = $ionicPopup.confirm({
-      title: 'Upgrade',
-      template: 'Are you sure you want to upgrade now?'
-    });
-    confirmPopup.then(function(res) {
-      if(res) {
-        var vsnUtils = mobileCaddy.require('mobileCaddy/vsnUtils');
-        vsnUtils.upgradeIfAvailable().then(function(res){
-          //console.log('upgradeIfAvailable', res);
+    devUtils.dirtyTables().then(function(tables){
+      if (tables && tables.length === 0) {
+        var confirmPopup = $ionicPopup.confirm({
+          title: 'Upgrade',
+          template: 'Are you sure you want to upgrade now?'
+        });
+        confirmPopup.then(function(res) {
+          if(res) {
+            $ionicLoading.show({
+              duration: 30000,
+              delay : 400,
+              maxWidth: 600,
+              noBackdrop: true,
+              template: '<h1>Upgrade app...</h1><p id="app-upgrade-msg" class="item-icon-left">Upgrading...<ion-spinner/></p>'
+            });
+            vsnUtils.upgradeIfAvailable().then(function(res){
+              //console.log('upgradeIfAvailable', res);
+            }).catch(function(e){
+              console.error(e);
+              $ionicLoading.hide();
+            });
+          }
+        });
+      } else {
+        $scope.data = {};
+        $ionicPopup.show({
+          title: 'Upgrade',
+          subTitle: 'Unable to upgrade. A sync is required - please try later.',
+          scope: $scope,
+          buttons: [
+            {
+              text: 'OK',
+              type: 'button-positive',
+              onTap: function(e) {
+                return true;
+              }
+            }
+          ]
         });
       }
     });
@@ -324,7 +356,7 @@ angular.module('starter.controllers', ['ionic'])
   */
   $scope.showAdminPasswordPopup = function() {
     var adminTimeout = (1000 * 60 * 5); // 5 minutes
-    if ( $rootScope.adminLoggedIn > Date.now() - adminTimeout) {
+    if ($rootScope.adminLoggedIn > Date.now() - adminTimeout) {
       $location.path('tab/settings/devtools');
       $rootScope.adminLoggedIn = Date.now();
       $scope.$apply();
