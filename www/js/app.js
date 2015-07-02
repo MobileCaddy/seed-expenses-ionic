@@ -63,7 +63,8 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', '
     .state('app', {
       url: "/app",
       abstract: true,
-      templateUrl: RESOURCE_ROOT +  'templates/menu.html'
+      templateUrl: RESOURCE_ROOT +  'templates/menu.html',
+      controller: 'AppCtrl'
     })
 
     // the project app has its own child nav-view and history

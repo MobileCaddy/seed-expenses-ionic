@@ -2,6 +2,27 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
 
 /*
 ===========================================================================
+  AppCtrl - used for menu.html
+===========================================================================
+*/
+.controller('AppCtrl', ['$scope', '$rootScope', 'ProjectService', 'SyncService', 'devUtils', function($scope, $rootScope, ProjectService, SyncService, devUtils) {
+
+  $scope.doRefreshAndSync = function() {
+    //console.log('doRefreshAndSync');
+    ProjectService.all(false).then(function(projects) {
+      $rootScope.projects = projects;
+      if (SyncService.getSyncState() != "Syncing") {
+        SyncService.syncTables(['MC_Project__ap', 'MC_Time_Expense__ap'], true);
+      }
+    }, function(reason) {
+      console.error('promise returned reason -> ' + reason);
+    });
+  };
+
+}])
+
+/*
+===========================================================================
   ProjectIndexCtrl
 ===========================================================================
 */
@@ -41,11 +62,9 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
 
   ProjectService.all($rootScope.refreshFlag).then(function(projects) {
     $rootScope.projects = projects;
-    //console.log('ProjectIndexCtrl, got projects');
     $ionicLoading.hide();
-    SyncButtonsClass("Remove", "ng-hide");
   }, function(reason) {
-    //console.log('promise returned reason -> ' + reason);
+    console.error('promise returned reason -> ' + reason);
   });
   $rootScope.refreshFlag = false;
 
@@ -54,19 +73,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   	ProjectService.all(true).then(function(projects) {
       $rootScope.projects = projects;
     }, function(reason) {
-      //console.log('promise returned reason -> ' + reason);
-    });
-  };
-
-  $scope.doRefreshAndSync = function() {
-    //console.log('doRefreshAndSync');
-    ProjectService.all(false).then(function(projects) {
-      $rootScope.projects = projects;
-      if (SyncService.getSyncState() != "Syncing") {
-        SyncService.syncTables(['MC_Project__ap', 'MC_Time_Expense__ap'], true);
-      }
-    }, function(reason) {
-      //console.log('promise returned reason -> ' + reason);
+      console.error('promise returned reason -> ' + reason);
     });
   };
 
@@ -82,49 +89,41 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
       case "Sync" :
         updateSyncButtonsText("Syncing...");
         SyncButtonsClass("Remove", "ng-hide");
-        SyncButtonsClass("Add", "disabled");
         break;
       case "Complete" :
-        // updateSyncButtonsText("Refresh and Sync");
         SyncButtonsClass("Add", "ng-hide");
         break;
       case "100497" :
         SyncButtonsClass("Remove", "ng-hide");
         updateSyncButtonsText("No device records to sync...");
-        // SyncButtonsClass("Remove", "disabled");
         $timeout( function() {
           SyncButtonsClass("Add", "ng-hide");
-        },5000);
+        },3000);
         break;
       case "100498" :
         SyncButtonsClass("Remove", "ng-hide");
         updateSyncButtonsText("Sync already in progress...");
-        // SyncButtonsClass("Remove", "disabled");
         $timeout( function() {
           SyncButtonsClass("Add", "ng-hide");
-        },5000);
+        },3000);
         break;
       case "100402" :
         SyncButtonsClass("Remove", "ng-hide");
         updateSyncButtonsText("Please connect before syncing");
-        // SyncButtonsClass("Remove", "disabled");
         $timeout( function() {
           SyncButtonsClass("Add", "ng-hide");
-        },5000);
+        },3000);
         break;
       default :
         if (args.result.toString().indexOf("Error") >= 0) {
           SyncButtonsClass("Remove", "ng-hide");
           updateSyncButtonsText(args.result.toString());
           $timeout( function() {
-            // updateSyncButtonsText("Refresh and Sync");
             SyncButtonsClass("Add", "ng-hide");
           },10000);
         } else {
-          // updateSyncButtonsText("Refresh and Sync");
           SyncButtonsClass("Add", "ng-hide");
         }
-        // SyncButtonsClass("Remove", "disabled");
     }
   });
 
@@ -138,13 +137,13 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
     for (var i = syncButtons.length - 1; i >= 0; --i) {
       if (action == "Remove") {
         angular.element(syncButtons[i]).removeClass(className);
-        if (className == "disabled") {
-          SyncService.setSyncState("Complete");
+        if (className == "ng-hide") {
+          SyncService.setSyncState("Syncing"); // removing ng-hide => syncing (or message being displayed)
         }
       } else {
         angular.element(syncButtons[i]).addClass(className);
-        if (className == "disabled") {
-          SyncService.setSyncState("Syncing");
+        if (className == "ng-hide") {
+          SyncService.setSyncState("Complete"); // adding ng-hide => sync complete
         }
       }
     }
@@ -159,10 +158,13 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
     // Any dirty tables to sync?
     devUtils.dirtyTables().then(function(tables){
       if (tables && tables.length !== 0) {
-        // Is the 'Refresh and Sync' enabled?
-        if (!angular.element(storesSyncButton).hasClass("disabled")) {
+        // Is the 'Refresh and Sync' button at bottom of screen hidden? hidden=>ok to start a sync
+        if (angular.element(storesSyncButton).hasClass("ng-hide")) {
           updateSyncButtonsText("Sync Required");
-          SyncButtonsClass("Remove", "disabled");
+          SyncButtonsClass("Remove", "ng-hide");
+          $timeout( function() {
+            SyncButtonsClass("Add", "ng-hide");
+          },10000);
         }
       }
     });
