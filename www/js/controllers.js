@@ -76,7 +76,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
     $scope.search.query = "";
   };
 
-  $scope.$on('handleSyncTables', function(event, args) {
+  $rootScope.$on('handleSyncTables', function(event, args) {
     //console.log("handleSyncTables called args", args);
     switch (args.result.toString()) {
       case "Sync" :
