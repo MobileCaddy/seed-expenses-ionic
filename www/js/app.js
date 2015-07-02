@@ -1,7 +1,6 @@
 angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', 'ngCordova'])
 
-// .run(['$ionicPlatform', '$rootScope', 'NetworkService', 'AppRunStatusService', 'NotificationService', function($ionicPlatform, $rootScope, NetworkService, AppRunStatusService, NotificationService) {
-.run(function($ionicPlatform, $rootScope, NetworkService, AppRunStatusService, NotificationService) {
+.run(['$ionicPlatform', '$rootScope', 'NetworkService', 'AppRunStatusService', 'NotificationService', function($ionicPlatform, $rootScope, NetworkService, AppRunStatusService, NotificationService) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -50,10 +49,9 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', '
   $rootScope.$on('syncTables', function(event, args) {
       $rootScope.$broadcast('handleSyncTables', args);
   });
-})
+}])
 
-.config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
-// .config(['$stateProvider', '$urlRouterProvider', '$ionicConfigProvider', function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+.config(['$stateProvider', '$urlRouterProvider', '$ionicConfigProvider', function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
   // Set up the various states which the app can be in.
@@ -178,7 +176,7 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', '
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/tab/projects');
 
-});
+}]);
 
 // This is the function that get's called once the MobileCaddy libs are done
 // checking the app install/health. Basically the point at which our client
