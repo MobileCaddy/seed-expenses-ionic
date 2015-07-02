@@ -1,4 +1,4 @@
-angular.module('starter.controllers', ['ionic'])
+angular.module('starter.controllers', ['ionic', 'ngCordova'])
 
 /*
 ===========================================================================
@@ -533,11 +533,33 @@ angular.module('starter.controllers', ['ionic'])
 }])
 
 
-.controller('TestingCtrl', ['$scope', 'AppRunStatusService', function($scope, AppRunStatusService) {
+.controller('TestingCtrl', ['$scope', '$cordovaLocalNotification', 'AppRunStatusService', 'NotificationService', function($scope, $cordovaLocalNotification, sAppRunStatusService, NotificationService) {
 
   $scope.resumeEvent = function() {
     //console.log("resumeEvent");
     AppRunStatusService.statusEvent('resume');
+  };
+
+  $scope.localNotification = function(id) {
+    var alarmTime = new Date();
+    alarmTime.setSeconds(alarmTime.getSeconds() + 15);
+    var args = {
+      id: 100100,
+      at: alarmTime,
+      title: "Unsynced records",
+      text: "Unsynced records on device",
+      sound: null};
+    if(device.platform == "Android") {
+       args.ongoing = true;
+       args.smallIcon = "res://icon";
+    }
+    $cordovaLocalNotification.schedule(args).then(function () {
+      //console.log("The notification 100100 has been set for 15 seconds");
+    }) ;
+  };
+
+  $scope.localNotificationTrigger = function(id) {
+    NotificationService.handleLocalNotification(id, 'foreground');
   };
 
 }])

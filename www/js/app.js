@@ -1,6 +1,7 @@
-angular.module('starter', ['ionic', 'starter.services', 'starter.controllers'])
+angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', 'ngCordova'])
 
-.run(function($ionicPlatform, $rootScope, NetworkService, AppRunStatusService) {
+// .run(['$ionicPlatform', '$rootScope', 'NetworkService', 'AppRunStatusService', 'NotificationService', function($ionicPlatform, $rootScope, NetworkService, AppRunStatusService, NotificationService) {
+.run(function($ionicPlatform, $rootScope, NetworkService, AppRunStatusService, NotificationService) {
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -10,6 +11,19 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers'])
     if (window.StatusBar) {
       // org.apache.cordova.statusbar required
       StatusBar.styleLightContent();
+    }
+
+    // Local Notification plugin
+    if (cordova && cordova.plugins && cordova.plugins.notification) {
+      if(device.platform === "iOS") {
+         window.plugin.notification.local.promptForPermission();
+      }
+      cordova.plugins.notification.local.on("trigger", function (notification, state) {
+        NotificationService.handleLocalNotification(notification.id, state);
+      });
+      cordova.plugins.notification.local.on("click", function (notification, state) {
+        NotificationService.handleLocalNotificationClick(notification.id, state);
+      });
     }
 
     document.addEventListener("resume", function() {
@@ -39,6 +53,7 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers'])
 })
 
 .config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+// .config(['$stateProvider', '$urlRouterProvider', '$ionicConfigProvider', function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
   // Set up the various states which the app can be in.
