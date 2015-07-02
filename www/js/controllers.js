@@ -76,7 +76,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
     $scope.search.query = "";
   };
 
-  $scope.$on('handleSyncTables', function(event, args) {
+  $rootScope.$on('handleSyncTables', function(event, args) {
     //console.log("handleSyncTables called args", args);
     switch (args.result.toString()) {
       case "Sync" :
@@ -208,7 +208,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
     if (localProjects.length > 0) {
       $rootScope.projects = localProjects;
       $ionicLoading.hide();
-      $location.path('/projects');
+      $location.path('app/projects');
     }
   };
 
@@ -229,6 +229,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
     newProj.Id = $scope.project.Id;
     newProj.mc_package_002__Description__c  = $scope.project.formDescription;
     //console.log('update, project -> ' + angular.toJson(newProj));
+    // Update project
     ProjectService.update(newProj).then(function(retObject) {
       //console.log('update, retObject -> ' + angular.toJson(retObject));
       // Call with local callback function so project list is displayed quickly while background sync continues
@@ -236,7 +237,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
     }).then(function(projects) {
         $rootScope.projects = projects;
         $ionicLoading.hide();
-        $location.path('/projects');
+        $location.path('app/projects');
     }).catch(function(returnErr) {
       console.error('update,  returnErr ->' + angular.toJson(returnErr));
       $ionicLoading.hide();
