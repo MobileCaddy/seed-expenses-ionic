@@ -5,7 +5,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   ProjectIndexCtrl
 ===========================================================================
 */
-.controller('ProjectIndexCtrl', ['$scope', '$rootScope', '$ionicLoading', '$interval', 'ProjectService', 'SyncService', 'devUtils', function($scope, $rootScope, $ionicLoading, $interval, ProjectService, SyncService, devUtils) {
+.controller('ProjectIndexCtrl', ['$scope', '$rootScope', '$ionicLoading', '$interval', '$timeout', 'ProjectService', 'SyncService', 'devUtils', function($scope, $rootScope, $ionicLoading, $interval, $timeout, ProjectService, SyncService, devUtils) {
 
   // This unhides the nav-bar. The navbar is hidden in the cases where we want a
   // splash screen, such as in this app
