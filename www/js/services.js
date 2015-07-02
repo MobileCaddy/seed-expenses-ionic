@@ -110,13 +110,14 @@ angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smart
   ===========================================================================
   */
 
-.factory('SyncService', ['devUtils', function(devUtils){
+.factory('SyncService', ['$rootScope', 'devUtils', function($rootScope, devUtils){
 
   function  syncTables(tablesToSync, syncWithoutLocalUpdates, maxTableAge) {
     if (typeof(maxTableAge) == "undefined") {
       maxTableAge = (1000 * 60 * 3); // 3 minutes
     }
-    //console.log('syncTables maxTableAge', maxTableAge, syncWithoutLocalUpdates);
+    //console.log('syncTables syncWithoutLocalUpdates, maxTableAge',syncWithoutLocalUpdates,maxTableAge);
+    $rootScope.$broadcast('syncTables', {result : "Sync"});
 
     var stopSyncing = false;
     var firstSync = true;
@@ -149,6 +150,7 @@ angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smart
               // We stop syncing if the first sync has a problem
               if (firstSync) {
                 stopSyncing = true;
+                $rootScope.$broadcast('syncTables', {result : resObject.status});
               }
             }
             // Unable to sync -> set a localnotification
@@ -159,6 +161,7 @@ angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smart
         }
         if (syncCount == tablesToSync.length && !stopSyncing) {
           // All syncs complete
+          $rootScope.$broadcast('syncTables', {result : "Complete"});
         }
         firstSync = false;
       }).catch(function(res){
@@ -167,8 +170,10 @@ angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smart
               res.status == "100498" ||
               res.status == "100402")) {
           //console.log(res);
+          $rootScope.$broadcast('syncTables', {result : "Complete"});
         } else {
           console.error(res);
+          $rootScope.$broadcast('syncTables', {result : "Error"});
         }
         //NotificationService.setLocalNotification();
       });
@@ -241,6 +246,7 @@ angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smart
               localProjCB(projects);
           });
         }
+        $rootScope.$broadcast('syncTables', {result : "Sync"});
         // Sync table used in list (smart store is then populated)
         devUtils.syncMobileTable('MC_Project__ap', true).then(function(resObject){
           //console.log('Angular : Success from syncMobileTable -> ' + angular.toJson(resObject));
@@ -249,6 +255,7 @@ angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smart
               // Make sure we can carry on with background syncing other tables
               if (typeof(resObject.status) != "undefined" && resObject.status != "100400") {
                 // Couldn't sync MC_Project__ap
+                $rootScope.$broadcast('syncTables', {result : resObject.status});
               } else {
                 SyncService.syncTables(['MC_Project_Location__ap', 'MC_Time_Expense__ap'], true);
               }

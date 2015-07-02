@@ -8,7 +8,7 @@
         ng-click="clearSearch()">
       </button>
     </div>
-    <ion-refresher on-refresh="doRefresh()"
+    <ion-refresher on-refresh="doRefreshFromPulldown()"
                    pulling-text="Pull to refresh">
     </ion-refresher>
     <ion-scroll zooming="false" direction="y" id="project-list">
@@ -21,4 +21,6 @@
       </ion-item>
     </ion-scroll>
   </ion-content>
+  <button id="projects-sync-button" class="ng-hide sync-button button button-small button-positive" ng-click="doRefreshAndSync()">
+  </button>
 </ion-view>

@@ -32,6 +32,10 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers'])
   $rootScope.$on('refreshProjectTotals', function(event, args) {
       $rootScope.$broadcast('handleRefreshProjectTotals');
   });
+  // handle feedback from syncing of mobile tables
+  $rootScope.$on('syncTables', function(event, args) {
+      $rootScope.$broadcast('handleSyncTables', args);
+  });
 })
 
 .config(function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {

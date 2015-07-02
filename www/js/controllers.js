@@ -5,7 +5,7 @@ angular.module('starter.controllers', ['ionic'])
   ProjectIndexCtrl
 ===========================================================================
 */
-.controller('ProjectIndexCtrl', ['$scope', '$rootScope', '$ionicLoading', 'ProjectService', function($scope, $rootScope, $ionicLoading, ProjectService) {
+.controller('ProjectIndexCtrl', ['$scope', '$rootScope', '$ionicLoading', '$interval', 'ProjectService', 'SyncService', 'devUtils', function($scope, $rootScope, $ionicLoading, $interval, ProjectService, SyncService, devUtils) {
 
   // This unhides the nav-bar. The navbar is hidden in the cases where we want a
   // splash screen, such as in this app
@@ -14,8 +14,19 @@ angular.module('starter.controllers', ['ionic'])
 
   // Set height of list scrollable area
   var winHeight = window.innerHeight - 125;
-  var storesList = document.getElementById('project-list');
-  storesList.setAttribute("style","height:" + winHeight + "px");
+  var projectsList = document.getElementById('project-list');
+  projectsList.setAttribute("style","height:" + winHeight + "px");
+
+  // Get reference to refresh/sync button (so we can change text, disable etc)
+  var storesSyncButton = document.getElementById('projects-sync-button');
+
+  // Adjust width of list refresh/sync button (cater for multiple buttons on different pages)
+  var syncButtons = document.getElementsByClassName('sync-button');
+  // If you need adjust the width of the refresh/sync button on the list then uncomment and amend following code.
+  // Currently, the css on the button will set the width to 100%.
+  /*  for (var i = syncButtons.length - 1; i >= 0; --i) {
+    syncButtons[i].setAttribute("style","width:" + projectsList.offsetWidth + "px");
+  }*/
 
   // Setup the loader and starting templates
   if (typeof($rootScope.child) == "undefined") {
@@ -30,20 +41,32 @@ angular.module('starter.controllers', ['ionic'])
 
   ProjectService.all($rootScope.refreshFlag).then(function(projects) {
     $rootScope.projects = projects;
-    //console.log('Angular: ProjectIndexCtrl, got projects');
+    //console.log('ProjectIndexCtrl, got projects');
     $ionicLoading.hide();
+    SyncButtonsClass("Remove", "ng-hide");
   }, function(reason) {
-    //console.log('Angular: promise returned reason -> ' + reason);
+    //console.log('promise returned reason -> ' + reason);
   });
   $rootScope.refreshFlag = false;
 
-  $scope.doRefresh = function() {
-  	//console.log('Angular: doRefresh');
+  $scope.doRefreshFromPulldown = function() {
+  	//console.log('doRefreshFromPulldown');
   	ProjectService.all(true).then(function(projects) {
       $rootScope.projects = projects;
-      //console.log('Angular: ProjectIndexCtrl, projects -> ' + angular.toJson($rootScope.projects));
     }, function(reason) {
-      //console.log('Angular: promise returned reason -> ' + reason);
+      //console.log('promise returned reason -> ' + reason);
+    });
+  };
+
+  $scope.doRefreshAndSync = function() {
+    //console.log('doRefreshAndSync');
+    ProjectService.all(false).then(function(projects) {
+      $rootScope.projects = projects;
+      if (SyncService.getSyncState() != "Syncing") {
+        SyncService.syncTables(['MC_Project__ap', 'MC_Time_Expense__ap'], true);
+      }
+    }, function(reason) {
+      //console.log('promise returned reason -> ' + reason);
     });
   };
 
@@ -51,6 +74,88 @@ angular.module('starter.controllers', ['ionic'])
 
   $scope.clearSearch = function() {
     $scope.search.query = "";
+  };
+
+  $scope.$on('handleSyncTables', function(event, args) {
+    //console.log("handleSyncTables called args", args);
+    switch (args.result.toString()) {
+      case "Sync" :
+        updateSyncButtonsText("Syncing...");
+        SyncButtonsClass("Add", "disabled");
+        break;
+      case "Complete" :
+        updateSyncButtonsText("Refresh and Sync");
+        SyncButtonsClass("Remove", "disabled");
+        break;
+      case "100497" :
+        updateSyncButtonsText("No device records to sync...");
+        SyncButtonsClass("Remove", "disabled");
+        $timeout( function() {
+          updateSyncButtonsText("Refresh and Sync");
+        },5000);
+        break;
+      case "100498" :
+        updateSyncButtonsText("Sync already in progress...");
+        SyncButtonsClass("Remove", "disabled");
+        $timeout( function() {
+          updateSyncButtonsText("Refresh and Sync");
+        },5000);
+        break;
+      case "100402" :
+        updateSyncButtonsText("Please connect before syncing");
+        SyncButtonsClass("Remove", "disabled");
+        break;
+      default :
+        if (args.result.toString().indexOf("Error") >= 0) {
+          updateSyncButtonsText(args.result.toString());
+          $timeout( function() {
+            updateSyncButtonsText("Refresh and Sync");
+          },5000);
+        } else {
+          updateSyncButtonsText("Refresh and Sync");
+        }
+        SyncButtonsClass("Remove", "disabled");
+    }
+  });
+
+  function updateSyncButtonsText(newText) {
+    for (var i = syncButtons.length - 1; i >= 0; --i) {
+      angular.element(syncButtons[i]).html(newText);
+    }
+  }
+
+  function SyncButtonsClass(action, className) {
+    for (var i = syncButtons.length - 1; i >= 0; --i) {
+      if (action == "Remove") {
+        angular.element(syncButtons[i]).removeClass(className);
+        if (className == "disabled") {
+          SyncService.setSyncState("Complete");
+        }
+      } else {
+        angular.element(syncButtons[i]).addClass(className);
+        if (className == "disabled") {
+          SyncService.setSyncState("Syncing");
+        }
+      }
+    }
+  }
+
+  $interval(function() {
+    $scope.checkIfSyncRequired();
+  }, (1000 * 60 * 3));
+
+  $scope.checkIfSyncRequired = function() {
+    //console.log("checkIfSyncRequired");
+    // Any dirty tables to sync?
+    devUtils.dirtyTables().then(function(tables){
+      if (tables && tables.length !== 0) {
+        // Is the 'Refresh and Sync' enabled?
+        if (!angular.element(storesSyncButton).hasClass("disabled")) {
+          updateSyncButtonsText("Sync Required");
+          SyncButtonsClass("Remove", "disabled");
+        }
+      }
+    });
   };
 
 }])
@@ -85,7 +190,7 @@ angular.module('starter.controllers', ['ionic'])
       $scope.minutes = retObject.totalTime % 60;
       $scope.$apply();
     }).catch(function(returnErr) {
-      console.error('Angular: update,  returnErr ->' + angular.toJson(returnErr));
+      console.error('update,  returnErr ->' + angular.toJson(returnErr));
     });
   }
 
@@ -102,7 +207,7 @@ angular.module('starter.controllers', ['ionic'])
    * the MC object and call the update.
    */
   $scope.submitForm = function() {
-    //console.log('Angular: submitForm');
+    //console.log('submitForm');
     $ionicLoading.show({
       template: '<h1>Saving...</h1><p>Saving project...</p><i class="icon ion-loading-b" style="font-size: 32px"></i>',
       animation: 'fade-in',
@@ -113,9 +218,9 @@ angular.module('starter.controllers', ['ionic'])
     var newProj = {};
     newProj.Id = $scope.project.Id;
     newProj.mc_package_002__Description__c  = $scope.project.formDescription;
-    //console.log('Angular: update, project -> ' + angular.toJson(newProj));
+    //console.log('update, project -> ' + angular.toJson(newProj));
     ProjectService.update(newProj).then(function(retObject) {
-      //console.log('Angular: update, retObject -> ' + angular.toJson(retObject));
+      //console.log('update, retObject -> ' + angular.toJson(retObject));
       // Call with local callback function so project list is displayed quickly while background sync continues
       return ProjectService.all(true, localProjCB);
     }).then(function(projects) {
@@ -123,7 +228,7 @@ angular.module('starter.controllers', ['ionic'])
         $ionicLoading.hide();
         $location.path('/projects');
     }).catch(function(returnErr) {
-      console.error('Angular: update,  returnErr ->' + angular.toJson(returnErr));
+      console.error('update,  returnErr ->' + angular.toJson(returnErr));
       $ionicLoading.hide();
     });
   };
@@ -146,9 +251,9 @@ angular.module('starter.controllers', ['ionic'])
 
   ProjectService.expenses($stateParams.type, $stateParams.projectId).then(function(timesheets) {
     $scope.expenses = timesheets;
-    //console.log('Angular: ProjectExpenseCtrl -> ' + angular.toJson($scope.expenses ));
+    //console.log('ProjectExpenseCtrl -> ' + angular.toJson($scope.expenses ));
   }, function(reason) {
-    console.error('Angular: promise returned error, reason -> ' + reason);
+    console.error('promise returned error, reason -> ' + reason);
   });
 
 }])
@@ -186,7 +291,7 @@ angular.module('starter.controllers', ['ionic'])
       default :
         varNewExp.mc_package_002__Expense_Amount__c = $scope.expenseForm.expenseValue.$modelValue;
     }
-    //console.log('Angular: ProjectExpNewCtrl, varNewExp -> ' + angular.toJson(varNewExp));
+    //console.log('ProjectExpNewCtrl, varNewExp -> ' + angular.toJson(varNewExp));
     $ionicLoading.show({
       duration: 30000,
       delay : 400,
@@ -201,7 +306,7 @@ angular.module('starter.controllers', ['ionic'])
         $location.path("/tab/project/" + $stateParams.projectId);
       },
       function(e) {
-        console.error('Angular: ProjectExpNewCtrl, error', e);
+        console.error('ProjectExpNewCtrl, error', e);
         $ionicLoading.hide();
         var alertPopup = $ionicPopup.alert({
           title: 'Insert failed!',
@@ -265,7 +370,7 @@ angular.module('starter.controllers', ['ionic'])
       $scope.recsToSyncCount  = 0;
     }
   }, function(reason) {
-    console.error('Angular: promise returned reason -> ' + reason);
+    console.error('promise returned reason -> ' + reason);
   });
 
 
@@ -273,7 +378,7 @@ angular.module('starter.controllers', ['ionic'])
     .then(function(appSoupRecs) {
     $scope.settingsRecs = extractSettingsValues(appSoupRecs);
   }, function(reason) {
-    console.error('Angular: promise returned reason -> ' + reason);
+    console.error('promise returned reason -> ' + reason);
   });
 
   function extractSettingsValues(appSoupRecs) {
@@ -460,7 +565,7 @@ angular.module('starter.controllers', ['ionic'])
   DevService.allTables().then(function(tables) {
     $scope.tables = tables;
   }, function(reason) {
-    console.error('Angular: promise returned reason -> ' + reason);
+    console.error('promise returned reason -> ' + reason);
   });
 
 }])
@@ -478,7 +583,7 @@ angular.module('starter.controllers', ['ionic'])
     $scope.tableRecs = tableRecs;
     $ionicLoading.hide();
   }, function(reason) {
-    console.error('Angular: promise returned error -> ' + reason);
+    console.error('promise returned error -> ' + reason);
   });
 
   $scope.getItemHeight = function(item, index) {
