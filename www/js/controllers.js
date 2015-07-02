@@ -5,7 +5,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   ProjectIndexCtrl
 ===========================================================================
 */
-.controller('ProjectIndexCtrl', ['$scope', '$rootScope', '$ionicLoading', '$interval', 'ProjectService', 'SyncService', 'devUtils', function($scope, $rootScope, $ionicLoading, $interval, ProjectService, SyncService, devUtils) {
+.controller('ProjectIndexCtrl', ['$scope', '$rootScope', '$ionicLoading', '$interval', '$timeout', 'ProjectService', 'SyncService', 'devUtils', function($scope, $rootScope, $ionicLoading, $interval, $timeout, ProjectService, SyncService, devUtils) {
 
   // This unhides the nav-bar. The navbar is hidden in the cases where we want a
   // splash screen, such as in this app
@@ -13,7 +13,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   angular.element(e).removeClass( "mc-hide" );
 
   // Set height of list scrollable area
-  var winHeight = window.innerHeight - 125;
+  var winHeight = window.innerHeight;
   var projectsList = document.getElementById('project-list');
   projectsList.setAttribute("style","height:" + winHeight + "px");
 
@@ -81,40 +81,50 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
     switch (args.result.toString()) {
       case "Sync" :
         updateSyncButtonsText("Syncing...");
+        SyncButtonsClass("Remove", "ng-hide");
         SyncButtonsClass("Add", "disabled");
         break;
       case "Complete" :
-        updateSyncButtonsText("Refresh and Sync");
-        SyncButtonsClass("Remove", "disabled");
+        // updateSyncButtonsText("Refresh and Sync");
+        SyncButtonsClass("Add", "ng-hide");
         break;
       case "100497" :
+        SyncButtonsClass("Remove", "ng-hide");
         updateSyncButtonsText("No device records to sync...");
-        SyncButtonsClass("Remove", "disabled");
+        // SyncButtonsClass("Remove", "disabled");
         $timeout( function() {
-          updateSyncButtonsText("Refresh and Sync");
+          SyncButtonsClass("Add", "ng-hide");
         },5000);
         break;
       case "100498" :
+        SyncButtonsClass("Remove", "ng-hide");
         updateSyncButtonsText("Sync already in progress...");
-        SyncButtonsClass("Remove", "disabled");
+        // SyncButtonsClass("Remove", "disabled");
         $timeout( function() {
-          updateSyncButtonsText("Refresh and Sync");
+          SyncButtonsClass("Add", "ng-hide");
         },5000);
         break;
       case "100402" :
+        SyncButtonsClass("Remove", "ng-hide");
         updateSyncButtonsText("Please connect before syncing");
-        SyncButtonsClass("Remove", "disabled");
+        // SyncButtonsClass("Remove", "disabled");
+        $timeout( function() {
+          SyncButtonsClass("Add", "ng-hide");
+        },5000);
         break;
       default :
         if (args.result.toString().indexOf("Error") >= 0) {
+          SyncButtonsClass("Remove", "ng-hide");
           updateSyncButtonsText(args.result.toString());
           $timeout( function() {
-            updateSyncButtonsText("Refresh and Sync");
-          },5000);
+            // updateSyncButtonsText("Refresh and Sync");
+            SyncButtonsClass("Add", "ng-hide");
+          },10000);
         } else {
-          updateSyncButtonsText("Refresh and Sync");
+          // updateSyncButtonsText("Refresh and Sync");
+          SyncButtonsClass("Add", "ng-hide");
         }
-        SyncButtonsClass("Remove", "disabled");
+        // SyncButtonsClass("Remove", "disabled");
     }
   });
 
@@ -303,7 +313,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
       function(){
         $ionicLoading.hide();
         $rootScope.$broadcast('refreshProjectTotals');
-        $location.path("/tab/project/" + $stateParams.projectId);
+        $location.path("/app/project/" + $stateParams.projectId);
       },
       function(e) {
         console.error('ProjectExpNewCtrl, error', e);
@@ -462,9 +472,8 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   $scope.showAdminPasswordPopup = function() {
     var adminTimeout = (1000 * 60 * 5); // 5 minutes
     if ($rootScope.adminLoggedIn > Date.now() - adminTimeout) {
-      $location.path('tab/settings/devtools');
+      $location.path('app/settings/devtools');
       $rootScope.adminLoggedIn = Date.now();
-      $scope.$apply();
     } else {
       $scope.data = {};
       var myPopup = $ionicPopup.show({
@@ -477,7 +486,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
             type: 'button-positive',
             onTap: function(e) {
             if (validateAdminPassword($scope.data.admin)) {
-                $location.path('tab/settings/devtools');
+                $location.path('app/settings/devtools');
                 $rootScope.adminLoggedIn = Date.now();
               } else {
                 //console.log("Password incorrect");
@@ -574,12 +583,12 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   var adminTimeout = (1000 * 60 *5 ); // 5 minutes
   if ( $rootScope.adminLoggedIn > Date.now() - adminTimeout) {
   } else {
-    $location.url('tab/settings');
+    $location.url('app/settings');
     var alertPopup = $ionicPopup.alert({
       title: 'Access Denied'
     });
     alertPopup.then(function(res) {
-      //$location.url('tab/settings');
+      //$location.url('app/settings');
       $scope.$apply();
     });
   }
@@ -677,25 +686,4 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
     //console.log(err);
   });
 }])
-
-/*
-===========================================================================
-  D I R E C T I V E S
-===========================================================================
-*/
-
-// hide-tabs
-// Usage: add hide-tabs to ion-view on page you want to hide tabs.
-// (tabsMain.html references $rootScope.hideTabs)
-.directive('hideTabs', function($rootScope) {
-  return {
-      restrict: 'A',
-      link: function($scope, $el) {
-          $rootScope.hideTabs = 'tabs-item-hide';
-          $scope.$on('$destroy', function() {
-            $rootScope.hideTabs = '';
-          });
-      }
-  };
-})
 ;

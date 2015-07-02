@@ -57,51 +57,49 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', '
   // Set up the various states which the app can be in.
   // Each state's controller can be found in controllers.js
 
-  $ionicConfigProvider.tabs.position('bottom');
-
   $stateProvider
 
-    // setup an abstract state for the tabs directive
-    .state('tab', {
-      url: "/tab",
+    // setup an abstract state for the app
+    .state('app', {
+      url: "/app",
       abstract: true,
-      templateUrl: RESOURCE_ROOT +  'templates/tabsMain.html'
+      templateUrl: RESOURCE_ROOT +  'templates/menu.html'
     })
 
-    // the project tab has its own child nav-view and history
-    .state('tab.project-index', {
+    // the project app has its own child nav-view and history
+    .state('app.project-index', {
       url: '/projects',
       views: {
-        'projects-tab': {
+        'menuContent': {
           templateUrl: RESOURCE_ROOT + 'templates/projectIndex.html',
           controller: 'ProjectIndexCtrl'
         }
       }
     })
 
-    .state('tab.project-detail', {
+    .state('app.project-detail', {
       url: '/project/:projectId',
       views: {
-        'projects-tab': {
+        'menuContent': {
           templateUrl: RESOURCE_ROOT +  'templates/projectDetail.html'
         }
       }
     })
 
-    .state('tab.project-expense', {
+    .state('app.project-expense', {
       url: '/project/:type/:projectId',
       views: {
-        'projects-tab': {
+        'menuContent': {
           templateUrl: RESOURCE_ROOT +  'templates/projectTimeExpList.html',
           controller: 'ProjectExpenseCtrl'
         }
       }
     })
 
-    .state('tab.project-expense-new', {
+    .state('app.project-expense-new', {
       url: '/project/:type/new/:projectId',
       views: {
-        'projects-tab': {
+        'menuContent': {
           templateUrl: RESOURCE_ROOT +  'templates/projectTimeExpNew.html',
           controller: 'ProjectExpNewCtrl'
         }
@@ -113,60 +111,60 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', '
      * S E T T I N G S    &    D E V    T O O L S
      ****************************************************/
 
-    .state('tab.settings', {
+    .state('app.settings', {
       url: '/settings',
       views: {
-        'settings-tab': {
+        'menuContent': {
           templateUrl: RESOURCE_ROOT +  'templates/settings.html',
           controller: 'SettingsCtrl'
         }
       }
     })
 
-    .state('tab.settings-devtools', {
+    .state('app.settings-devtools', {
       url: '/settings/devtools',
       views: {
-        'settings-tab': {
+        'menuContent': {
           templateUrl: RESOURCE_ROOT +  'templates/settingsDevTools.html',
           controller: 'SettingsCtrl'
         }
       }
     })
 
-    .state('tab.settings-mti', {
+    .state('app.settings-mti', {
       url: '/settings/mti',
       views: {
-        'settings-tab': {
+        'menuContent': {
           templateUrl: RESOURCE_ROOT +  'templates/settingsDevMTI.html',
           controller: 'MTICtrl'
         }
       }
     })
 
-    .state('tab.mti-detail', {
-      url: '/settings/mti/:tableName',
+    .state('app.mti-detail', {
+      url: '/settings/mti/:appleName',
       views: {
-        'settings-tab': {
+        'menuContent': {
           templateUrl: RESOURCE_ROOT +  'templates/settingsDevMTIDetail.html',
           controller: 'MTIDetailCtrl'
         }
       }
     })
 
-    .state('tab.settings-testing', {
+    .state('app.settings-testing', {
       url: '/settings/testing',
       views: {
-        'settings-tab': {
+        'menuContent': {
           templateUrl: RESOURCE_ROOT +  'templates/settingsTesting.html',
           controller: 'TestingCtrl'
         }
       }
     })
 
-    .state('tab.settings-deploy', {
+    .state('app.settings-deploy', {
       url: '/settings/deploy',
       views: {
-        'settings-tab': {
+        'menuContent': {
           templateUrl: RESOURCE_ROOT +  'templates/settingsDeploy.html',
           controller: 'DeployCtrl'
         }
@@ -174,7 +172,7 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', '
     });
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/tab/projects');
+  $urlRouterProvider.otherwise('/app/projects');
 
 }]);
 
