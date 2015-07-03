@@ -143,7 +143,7 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', '
     })
 
     .state('app.mti-detail', {
-      url: '/settings/mti/:appleName',
+      url: '/settings/mti/:tableName',
       views: {
         'menuContent': {
           templateUrl: RESOURCE_ROOT +  'templates/settingsDevMTIDetail.html',
