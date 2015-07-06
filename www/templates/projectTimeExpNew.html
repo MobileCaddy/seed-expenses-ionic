@@ -39,5 +39,21 @@
         </div>
       </div>
     </form>
+      <div class="row" ng-show="paramType=='Expense'">
+        <div class="col">
+          <button class="button-full button button-positive" ng-click="scanBarcode()">Scan Barcode</button>
+        </div>
+        <div class="col">
+          <button class="button-full button button-positive" ng-click="capturePhoto()">Take Picture</button>
+        </div>
+      </div>
+      <div class="row" ng-show="paramType=='Expense'">
+        <div class="col" ng-show="scanImageData">
+          <h4>{{scanImageData}}</h4>
+        </div>
+        <div class="col" ng-show="photoImageData">
+          <img data-ng-src="data:image/jpg;base64,{{photoImageData}}" />
+        </div>
+      </div>
   </ion-content>
 </ion-view>

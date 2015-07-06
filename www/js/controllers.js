@@ -28,6 +28,10 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
 */
 .controller('ProjectIndexCtrl', ['$scope', '$rootScope', '$ionicLoading', '$interval', '$timeout', 'ProjectService', 'SyncService', 'devUtils', function($scope, $rootScope, $ionicLoading, $interval, $timeout, ProjectService, SyncService, devUtils) {
 
+  // By default, 'ion-view's are cached - so this code will only run once.
+  // Use 'cache-view="false"' in the view if you want the controller code to run every time.
+  // projectIndex.html doesn't use it, whereas projectDetail.html does.
+
   // This unhides the nav-bar. The navbar is hidden in the cases where we want a
   // splash screen, such as in this app
   e = document.getElementById('my-nav-bar');
@@ -276,7 +280,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   ProjectExpNewCtrl - New Time or Expense
 ===========================================================================
 */
-.controller('ProjectExpNewCtrl', ['$scope', '$rootScope', '$stateParams', '$ionicLoading', '$ionicPopup', '$ionicModal', '$location', 'ProjectService', function($scope, $rootScope, $stateParams, $ionicLoading, $ionicPopup, $ionicModal, $location, ProjectService) {
+.controller('ProjectExpNewCtrl', ['$scope', '$rootScope', '$stateParams', '$ionicLoading', '$ionicPopup', '$ionicModal', '$location', '$cordovaBarcodeScanner', 'ProjectService', 'Camera', function($scope, $rootScope, $stateParams, $ionicLoading, $ionicPopup, $ionicModal, $location, $cordovaBarcodeScanner, ProjectService, Camera) {
 
   switch ($stateParams.type) {
       case 'time' :
@@ -326,6 +330,35 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
           template: '<p>Sorry, something went wrong.</p><p class="error_details">Error: ' + e.status + ' - ' + e.mc_add_status + '</p>'
         });
       });
+  };
+
+  $scope.scanImageData = null;
+
+  $scope.scanBarcode = function() {
+    if (cordova && cordova.plugins && cordova.plugins.barcodeScanner) {
+      $cordovaBarcodeScanner.scan().then(function(imageData) {
+        //console.log("Cancelled -> " + imageData.cancelled);
+        if (!imageData.cancelled) {
+          $scope.scanImageData = imageData;
+          //console.log("Barcode Format -> " + imageData.format);
+        }
+      }, function(error) {
+        console.error(err);
+      });
+    } else {
+      $scope.scanImageData = "9999092920299";
+    }
+  };
+
+  $scope.photoImageData = null;
+
+  $scope.capturePhoto = function() {
+    Camera.getPicture().then(function(imageData) {
+      //console.log('capturePhoto success');
+      $scope.photoImageData = imageData;
+    }, function(err) {
+      console.error(err);
+    });
   };
 
 }])
