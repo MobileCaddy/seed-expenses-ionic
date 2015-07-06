@@ -83,7 +83,8 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', '
       url: '/project/:projectId',
       views: {
         'projects-tab': {
-          templateUrl: RESOURCE_ROOT +  'templates/projectDetail.html'
+          templateUrl: RESOURCE_ROOT +  'templates/projectDetail.html',
+          controller: 'ProjectDetailCtrl'
         }
       }
     })
