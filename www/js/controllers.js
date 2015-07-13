@@ -567,7 +567,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
 }])
 
 
-.controller('TestingCtrl', ['$scope', '$cordovaLocalNotification', 'AppRunStatusService', 'NotificationService', function($scope, $cordovaLocalNotification, sAppRunStatusService, NotificationService) {
+.controller('TestingCtrl', ['$scope', '$cordovaLocalNotification', 'AppRunStatusService', 'NotificationService', function($scope, $cordovaLocalNotification, AppRunStatusService, NotificationService) {
 
   $scope.resumeEvent = function() {
     //console.log("resumeEvent");
