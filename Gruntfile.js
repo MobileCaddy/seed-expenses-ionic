@@ -102,7 +102,7 @@ module.exports = function(grunt) {
       dev: {
         options: {
           args: expressArgs,
-          script: 'cors/cors-server.js'
+          script: 'bower_components/mobilecaddy-codeflow/js/cors-server.js'
         }
       }
     },
@@ -153,8 +153,7 @@ module.exports = function(grunt) {
           {
             expand: true,
             flatten: true,
-            src: ['bower_components/ionic/release/js/ionic.bundle.min.js',
-                  'bower_components/ngCordova/dist/ng-cordova.min.js'],
+            src: ['bower_components/ionic/release/js/ionic.bundle.min.js'],
             dest: 'www/lib/js',
             filter: 'isFile'
           },
@@ -187,6 +186,14 @@ module.exports = function(grunt) {
         replacements: [{
           from: '?v=#{$ionicons-version}',
           to: ''
+        }]
+      },
+      ngCordovaMocks: {
+        src: ['bower_components/ngCordova/dist/ng-cordova-mocks.js'],
+        dest: 'tmp/ng-cordova-mocks.js',
+        replacements: [{
+          from: 'ngCordovaMocks',
+          to: 'ngCordova'
         }]
       }
     },
