@@ -13,10 +13,17 @@
 
   <ion-side-menu side="left" expose-aside-when="large">
     <ion-header-bar class="bar-assertive">
+        <button ng-click="goBack()" ng-if="lastItemSelected" class="button button-icon icon ion-ios-arrow-back"></button>
       <h1 class="title">Menu</h1>
     </ion-header-bar>
     <ion-content>
       <ion-list>
+        <div ng-repeat="item in items">
+            <ion-item ng-if="!item.node" ng-click="showSubmenu(item)" class="item-icon-right">
+              <i class="icon ion-ios-arrow-forward"></i>{{item.name}}
+            </ion-item>
+            <ion-item ng-if="item.node" href="{{item.href}}">{{item.name}}</ion-item>
+        </div>
         <ion-item menu-close href="#/app/projects">
           Projects
         </ion-item>

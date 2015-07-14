@@ -5,7 +5,38 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   AppCtrl - used for menu.html
 ===========================================================================
 */
-.controller('AppCtrl', ['$scope', '$rootScope', 'ProjectService', 'SyncService', 'devUtils', function($scope, $rootScope, ProjectService, SyncService, devUtils) {
+.controller('AppCtrl', ['$scope', '$rootScope', 'ProjectService', 'SyncService', 'devUtils', 'SideMenuService', function($scope, $rootScope, ProjectService, SyncService, devUtils, SideMenuService) {
+
+  var allSideMenuItems = SideMenuService.getSideMenuJson();
+
+  $scope.items = allSideMenuItems;
+  $scope.lastItemSelected = null;
+
+  $scope.showSubmenu = function(item) {
+    $scope.items = item.submenu;
+    $scope.lastItemSelected = item;
+  };
+
+  $scope.goBack = function() {
+    if ($scope.lastItemSelected.parentid === 0) {
+      $scope.items = allSideMenuItems;
+      $scope.lastItemSelected = null;
+    } else {
+      parentItem = findItemById(allSideMenuItems, $scope.lastItemSelected.parentid);
+      $scope.showSubmenu(parentItem);
+    }
+  };
+
+  function findItemById(obj, id) {
+    if (obj.id == id) { return obj; }
+    for (var i in obj) {
+      if (obj[i] !== null && typeof(obj[i]) == "object") {
+        var result = findItemById(obj[i], id);
+        if (result) { return result; }
+      }
+    }
+    return null;
+  }
 
   $scope.doRefreshAndSync = function() {
     //console.log('doRefreshAndSync');
