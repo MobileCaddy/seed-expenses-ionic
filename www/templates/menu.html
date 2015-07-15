@@ -22,7 +22,7 @@
             <ion-item ng-if="!item.node" ng-click="showSubmenu(item)" class="item-icon-right">
               <i class="icon ion-ios-arrow-forward"></i>{{item.name}}
             </ion-item>
-            <ion-item ng-if="item.node" href="{{item.href}}">{{item.name}}</ion-item>
+            <ion-item ng-if="item.node" menu-close href="{{item.href}}">{{item.name}}</ion-item>
         </div>
         <ion-item menu-close href="#/app/projects">
           Projects

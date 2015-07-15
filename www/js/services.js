@@ -117,25 +117,25 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
       {"id": 1, "name": "1", "node": false, "parentid": 0, "submenu": [
         {"id": 4, "name": "1.1", "node": false, "parentid": 1, "submenu": [
           {"id": 13, "name": "1.1.1", "node": false, "parentid": 4, "submenu": [
-            {"id": 14, "name": "1.1.1.1", "node": true, "parentid": 13, "href": "#/app/test.html", "submenu": []},
-            {"id": 15, "name": "1.1.1.2", "node": true, "parentid": 13, "href": "#/app/test.html", "submenu": []},
-            {"id": 16, "name": "1.1.1.3", "node": true, "parentid": 13, "href": "#/app/test.html", "submenu": []}
+            {"id": 14, "name": "1.1.1.1", "node": true, "parentid": 13, "href": "#/app/test", "submenu": []},
+            {"id": 15, "name": "1.1.1.2", "node": true, "parentid": 13, "href": "#/app/test", "submenu": []},
+            {"id": 16, "name": "1.1.1.3", "node": true, "parentid": 13, "href": "#/app/test", "submenu": []}
           ]}
         ]},
-        {"id": 5, "name": "1.2", "node": true, "parentid": 1, "href": "#/app/test.html", "submenu": []},
+        {"id": 5, "name": "1.2", "node": true, "parentid": 1, "href": "#/app/test", "submenu": []},
         {"id": 6, "name": "1.3", "node": false, "parentid": 1, "submenu": [
           {"id": 11, "name": "1.3.1", "node": false, "parentid": 6, "submenu": [
-            {"id": 12, "name": "1.3.1.1", "node": true, "parentid": 11, "href": "#/app/test.html", "submenu": []}
+            {"id": 12, "name": "1.3.1.1", "node": true, "parentid": 11, "href": "#/app/test", "submenu": []}
           ]}
         ]}
       ]},
       {"id": 2, "name": "2", "node": false, "parentid": 0, "submenu": [
-        {"id": 7, "name": "2.1", "node": true, "parentid": 2, "href": "#/app/test.html", "submenu": []},
-        {"id": 8, "name": "2.2", "node": true, "parentid": 2, "href": "#/app/test.html", "submenu": []}
+        {"id": 7, "name": "2.1", "node": true, "parentid": 2, "href": "#/app/test", "submenu": []},
+        {"id": 8, "name": "2.2", "node": true, "parentid": 2, "href": "#/app/test", "submenu": []}
       ]},
       {"id": 3, "name": "3", "node": false, "parentid": 0, "submenu": [
         {"id": 9, "name": "3.1", "node": false, "parentid": 3, "submenu": [
-          {"id": 10, "name": "3.1.1", "node": true, "parentid": 9, "href": "#/app/test.html", "submenu": []}
+          {"id": 10, "name": "3.1.1", "node": true, "parentid": 9, "href": "#/app/test", "submenu": []}
         ]}
       ]}
     ];
