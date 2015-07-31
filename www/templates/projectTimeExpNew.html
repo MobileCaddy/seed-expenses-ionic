@@ -13,17 +13,17 @@
               </label>
               <label class="item item-input item-stacked-label">
                 <span class="input-label">Duration in minutes</span>
-                  <input name="expenseValue" ng-model="expenseValue"  type="number" required/>
+                  <input name="expenseValue" ng-model="expenseValue" type="number" required/>
               </label>
            </span>
            <span ng-switch-when="Expense">
               <label class="item item-input item-stacked-label">
                 <span class="input-label">Description</span>
-                <input name="description" ng-model="description"  type="text" placeholder="What did you spend money on?" required/>
+                <input name="description" ng-model="description" type="text" placeholder="What did you spend money on?" required/>
               </label>
               <label class="item item-input item-stacked-label">
                 <span class="input-label">How much was it?</span>
-                  <input name="expenseValue" ng-model="expenseValue"  type="number" required/>
+                  <input name="expenseValue" ng-model="expenseValue" type="number" step="0.01" ng-pattern="/^-?[0-9]+(\.[0-9]{1,2})?$/" required/>
               </label>
            </span>
         </span>
