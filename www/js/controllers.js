@@ -339,7 +339,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
       $cordovaBarcodeScanner.scan().then(function(imageData) {
         //console.log("Cancelled -> " + imageData.cancelled);
         if (!imageData.cancelled) {
-          $scope.scanImageData = imageData;
+          $scope.scanImageData = imageData.text;
           //console.log("Barcode Format -> " + imageData.format);
         }
       }, function(error) {
