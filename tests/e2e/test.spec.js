@@ -2,14 +2,14 @@
 describe("Projects", function() {
 
   it("should have a projects list with 5 projects", function() {
-    browser.get('http://localhost:3030/www/#/tab/projects').then(function() {
+    browser.get('http://localhost:3030/www/#/app/projects?local=true').then(function() {
       return browser.getTitle();
     }).then(function(title) {
       expect(title).toEqual("Ionic Time & Expenses Demo App");
-    	browser.sleep(3000);
+      browser.sleep(3000);
       expect(browser.getTitle()).toEqual("Projects");
       var projects = element.all(by.collRepeater('project in projects'));
-      expect(projects.first().getText()).toContain('Collect Bus');
+      expect(projects.first().getText()).toContain('Clear up roof gutters');
       expect(projects.get(6).getText()).toEqual('');
     });
 
@@ -17,17 +17,17 @@ describe("Projects", function() {
 
   it("should have a searchable projects list", function() {
     var projects = element.all(by.binding('project.Name'));
-    var searchBox = element(by.model('query'));
+    var searchBox = element(by.model('search.query'));
+    expect(projects.first().getText()).toContain('Clear up roof gutters');
+    searchBox.sendKeys('collec');
     expect(projects.first().getText()).toContain('Collect Bus');
-    searchBox.sendKeys('clea');
-    expect(projects.first().getText()).toEqual('Clear up roof gutters');
     searchBox.clear();
-    expect(projects.first().getText()).toContain('Collect Bus');
+    expect(projects.first().getText()).toContain('Clear up roof gutters');
   });
 
   it("should have detailed project view", function() {
     var projects = element.all(by.binding('project.Name'));
-    projects.get(0).click();
+    projects.get(1).click();
     browser.sleep(800);
     expect(browser.getTitle()).toContain('Collect Bus');
     expect(element(by.model('project.formDescription')).getAttribute('value')).toContain('Justin would');
@@ -66,8 +66,7 @@ describe("Projects", function() {
     browser.sleep(1000);
     element.all(by.css('.button-block')).get(1).click();
     browser.sleep(800);
-    expect(browser.getTitle()).toEqual('New Timesheet');
-    var subBtn = element(by.css('.button-positive'));
+    var subBtn = element(by.css('.submit-expense'));
     expect(subBtn.isEnabled()).toEqual(false);
   });
 
