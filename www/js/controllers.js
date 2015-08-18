@@ -690,6 +690,50 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   };
 }])
 
+/*
+---------------------------------------------------------------------------
+  STF (Save Mobile Table To File)
+---------------------------------------------------------------------------
+*/
+.controller('STFCtrl', ['$scope', '$ionicLoading', 'DevService', 'FileService', function($scope, $ionicLoading, DevService, FileService) {
+
+  DevService.allTables().then(function(tables) {
+    $scope.tables = tables;
+  }, function(reason) {
+    console.error('promise returned reason -> ' + reason);
+  });
+
+  $scope.savedFiles = [];
+
+  $scope.saveTableToFile = function(tableName) {
+    var today = new Date();
+    var fileName = tableName + "-" + today.getFullYear() + "-" + pad(today.getMonth()+1) + "-" + pad(today.getDate()) + "-" + pad(today.getHours()) + "-" + pad(today.getMinutes()) + "-" + pad(today.getSeconds()) + ".txt";
+    console.log("mc fileName",fileName);
+
+    $ionicLoading.show({
+      duration: 30000,
+      noBackdrop: true,
+      template: '<p id="app-progress-msg" class="item-icon-left">Saving records to file...<ion-spinner/></p>'
+    });
+    DevService.allRecords(tableName, false).then(function(tableRecs) {
+      // console.log("mc tableRecs",angular.toJson(tableRecs));
+      return FileService.writeFile(fileName, angular.toJson(tableRecs));
+    }).then(function(fileDir) {
+      $scope.fileDir = fileDir;
+      $scope.savedFiles.push(fileName);
+      $ionicLoading.hide();
+    }).catch(function(reason) {
+      $ionicLoading.hide();
+      console.error('promise returned error -> ' + reason);
+    });
+  };
+
+  function pad(num) {
+      var s = "0" + num;
+      return s.substr(s.length-2);
+  }
+
+}])
 
 /*
 ---------------------------------------------------------------------------

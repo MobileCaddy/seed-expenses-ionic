@@ -1,0 +1,24 @@
+<ion-view cache-view="false" title="Save Table To File">
+	<ion-content>
+		<div ng-show="fileDir">
+	   	<ion-list>
+				<div class="list list-inset">
+			   	<div class="item item-divider item-text-wrap">Files saved to: {{fileDir}}</div>
+					<div ng-repeat="file in savedFiles" class="item item-text-wrap">
+						{{file}}
+					</div>
+    		</div>
+	    </ion-list>
+    </div>
+   	<ion-list>
+			<div class="list list-inset">
+      	<ion-item ng-repeat="table in tables" type="item-text-wrap" class="item-button-right">
+      	  <h3>{{table.Name}}</h3>
+      	  <button class="button button-positive" ng-click="saveTableToFile(table.Name)">
+  	        <i class="icon ion-archive"></i>
+  	      </button>
+      	</ion-item>
+    	</div>
+    </ion-list>
+  </ion-content>
+</ion-view>

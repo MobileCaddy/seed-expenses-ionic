@@ -163,6 +163,16 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', '
       }
     })
 
+    .state('app.settings-savetofile', {
+      url: '/settings/savetofile',
+      views: {
+        'menuContent': {
+          templateUrl: RESOURCE_ROOT +  'templates/settingsTableSave.html',
+          controller: 'STFCtrl'
+        }
+      }
+    })
+
     .state('app.settings-deploy', {
       url: '/settings/deploy',
       views: {

@@ -20,6 +20,36 @@ angular.module('smartStoreUtils', [])
 
 angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnUtils', 'smartStoreUtils'])
 
+.factory('FileService', ['$cordovaFile', function($cordovaFile){
+  function writeFile(fileName, text) {
+    return new Promise(function(resolve, reject) {
+      var fileDir;
+      if (cordova.file) {
+        if (ionic.Platform.isAndroid()) {
+          fileDir = cordova.file.externalDataDirectory;
+        }
+        if (ionic.Platform.isIOS()) {
+          fileDir = cordova.file.documentsDirectory;
+        }
+        $cordovaFile.writeFile(fileDir, fileName, text, true).then(function (success) {
+            resolve(fileDir.replace(cordova.file.externalRootDirectory,""));
+        }, function (error) {
+          console.error("mc writeFile error",error);
+          reject(error);
+        });
+      } else {
+        resolve("Not on device");
+      }
+    });
+  }
+
+  return {
+    writeFile: function(fileName, text){
+      return writeFile(fileName, text);
+    }
+  };
+}])
+
 /*
  * handles network events (online/offline) and kicks off tasks if needed
  */
