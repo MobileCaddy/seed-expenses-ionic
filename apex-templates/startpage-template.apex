@@ -17,7 +17,7 @@
         <script src="{!URLFOR($Resource.MY_APP_RESOURCE, 'www/js/app.js')}" type="text/javascript"></script>
         <script src="{!URLFOR($Resource.MY_APP_RESOURCE, 'www/js/services.js')}" type="text/javascript"></script>
         <script src="{!URLFOR($Resource.MY_APP_RESOURCE, 'www/js/controllers.js')}" type="text/javascript"></script>
-        <script src="{!URLFOR($Resource.MY_APP_RESOURCE, 'www/lib/js/ng-cordova.js')}" type="text/javascript"></script>
+        <script src="{!URLFOR($Resource.MY_APP_RESOURCE, 'www/lib/js/ng-cordova.min.js')}" type="text/javascript"></script>
 
         <!-- ============== -->
         <!-- Your App's CSS -->

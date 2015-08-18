@@ -174,6 +174,10 @@ module.exports = function(grunt) {
           {
             src: ['bower_components/forcejs/oauthcallback.html'],
             dest: 'oauthcallback.html'
+          },
+          {
+            src: 'bower_components/ngCordova/dist/ng-cordova.min.js',
+            dest: 'www/lib/js/ng-cordova.min.js'
           }
         ]
       }
