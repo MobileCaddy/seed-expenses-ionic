@@ -95,7 +95,12 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
     });
   }
 
-  ProjectService.all($rootScope.refreshFlag).then(function(projects) {
+  var localProjCB = function(localProjects) {
+    $rootScope.projects = localProjects;
+    if (localProjects.length > 0) $ionicLoading.hide();
+  };
+
+  ProjectService.all($rootScope.refreshFlag, localProjCB).then(function(projects) {
     $rootScope.projects = projects;
     $ionicLoading.hide();
   }, function(reason) {
