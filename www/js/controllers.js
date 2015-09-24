@@ -468,7 +468,24 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
               template: '<h1>Upgrade app...</h1><p id="app-upgrade-msg" class="item-icon-left">Upgrading...<ion-spinner/></p>'
             });
             vsnUtils.upgradeIfAvailable().then(function(res){
-              //console.log('upgradeIfAvailable', res);
+              if (!res) {
+                $ionicLoading.hide();
+                $scope.data = {};
+                $ionicPopup.show({
+                  title: 'Upgrade',
+                  subTitle: 'The upgrade could not take place due to sync in progress. Please try again later.',
+                  scope: $scope,
+                  buttons: [
+                    {
+                      text: 'OK',
+                      type: 'button-positive',
+                      onTap: function(e) {
+                        return true;
+                      }
+                    }
+                  ]
+                });
+              }
             }).catch(function(e){
               console.error(e);
               $ionicLoading.hide();
