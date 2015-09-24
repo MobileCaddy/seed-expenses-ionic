@@ -105,7 +105,24 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
                   });
                   localStorage.removeItem('prevUpNotification');
                   vsnUtils.upgradeIfAvailable().then(function(res){
-                    //console.log('upgradeIfAvailable', res);
+                    if (!res) {
+                      $ionicLoading.hide();
+                      $scope.data = {};
+                      $ionicPopup.show({
+                        title: 'Upgrade',
+                        subTitle: 'The upgrade could not take place due to sync in progress. Please try again later.',
+                        scope: $scope,
+                        buttons: [
+                          {
+                            text: 'OK',
+                            type: 'button-positive',
+                            onTap: function(e) {
+                              return true;
+                            }
+                          }
+                        ]
+                      });
+                    }
                   }).catch(function(e){
                     console.error(e);
                     $ionicLoading.hide();
