@@ -5,7 +5,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   ProjectIndexCtrl
 ===========================================================================
 */
-.controller('ProjectIndexCtrl', ['$scope', '$rootScope', '$ionicLoading', '$interval', '$timeout', 'ProjectService', 'SyncService', 'devUtils', function($scope, $rootScope, $ionicLoading, $interval, $timeout, ProjectService, SyncService, devUtils) {
+.controller('ProjectIndexCtrl', ['$scope', '$rootScope', '$ionicLoading', '$interval', '$timeout', 'ProjectService', 'SyncService', 'devUtils', 'logger', function($scope, $rootScope, $ionicLoading, $interval, $timeout, ProjectService, SyncService, devUtils, logger) {
 
   // By default, 'ion-view's are cached - so this code will only run once.
   // Use 'cache-view="false"' in the view if you want the controller code to run every time.
@@ -54,6 +54,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
     $ionicLoading.hide();
     SyncButtonsClass("Remove", "ng-hide");
   }, function(reason) {
+    logger.error("ProjectService.all " + JSON.stringify(reason));
     //console.log('promise returned reason -> ' + reason);
   });
   $rootScope.refreshFlag = false;
@@ -63,18 +64,20 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   	ProjectService.all(true).then(function(projects) {
       $rootScope.projects = projects;
     }, function(reason) {
+      logger.error("doRefreshFromPulldown ProjectService.all " + JSON.stringify(reason));
       //console.log('promise returned reason -> ' + reason);
     });
   };
 
   $scope.doRefreshAndSync = function() {
-    //console.log('doRefreshAndSync');
+    logger.log('doRefreshAndSync');
     ProjectService.all(false).then(function(projects) {
       $rootScope.projects = projects;
       if (SyncService.getSyncState() != "Syncing") {
-        SyncService.syncTables(['MC_Project__ap', 'MC_Time_Expense__ap'], true);
+        SyncService.syncTables(['MC_Project__ap', 'MC_Time_Expense__ap', 'Mobile_Log__mc'], true);
       }
     }, function(reason) {
+      logger.error("doRefreshAndSync ProjectService.all " + JSON.stringify(reason));
       //console.log('promise returned reason -> ' + reason);
     });
   };
@@ -87,6 +90,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
 
   $rootScope.$on('handleSyncTables', function(event, args) {
     //console.log("handleSyncTables called args", args);
+    logger.log("Handling SyncTables " + JSON.stringify(args));
     switch (args.result.toString()) {
       case "Sync" :
         updateSyncButtonsText("Syncing...");
@@ -174,16 +178,16 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   ProjectDetailCtrl
 ===========================================================================
 */
-.controller('ProjectDetailCtrl', ['$scope', '$rootScope', '$stateParams', '$location', '$ionicLoading', 'ProjectService', function($scope, $rootScope, $stateParams, $location, $ionicLoading,  ProjectService) {
+.controller('ProjectDetailCtrl', ['$scope', '$rootScope', '$stateParams', '$location', '$ionicLoading', 'ProjectService', 'logger', function($scope, $rootScope, $stateParams, $location, $ionicLoading,  ProjectService, logger) {
 
   // Listen for event broadcast when new Time/Expense created
-  var unregisterEvent =  $rootScope.$on('handleRefreshProjectTotals', function(event) {
+  var unregisterGetTotalsEvent =  $rootScope.$on('handleRefreshProjectTotals', function(event) {
     getProjectTotals();
   });
 
   // Unregister the event listener when the current scope is destroyed
   $scope.$on('$destroy', function() {
-    unregisterEvent();
+    unregisterGetTotalsEvent();
   });
 
   $scope.project = ProjectService.get($stateParams.projectId);
@@ -199,7 +203,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
       $scope.minutes = retObject.totalTime % 60;
       $scope.$apply();
     }).catch(function(returnErr) {
-      console.error('update,  returnErr ->' + angular.toJson(returnErr));
+      logger.error('getProjectTotals ' + JSON.stringify(returnErr));
     });
   }
 
@@ -235,9 +239,10 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
     }).then(function(projects) {
         $rootScope.projects = projects;
         $ionicLoading.hide();
+        logger.error("Simulating an error when updating project " + $scope.project.Name);
         $location.path('/projects');
     }).catch(function(returnErr) {
-      console.error('update,  returnErr ->' + angular.toJson(returnErr));
+      logger.error('getProjectTotals ' + JSON.stringify(returnErr));
       $ionicLoading.hide();
     });
   };
@@ -251,7 +256,6 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
 */
 .controller('ProjectExpenseCtrl', ['$scope', '$stateParams', 'ProjectService', function($scope, $stateParams, ProjectService) {
 
-  //console.log('Angular : ProjectExpenseCtrl, projectId ->' + $stateParams.projectId);
   switch ($stateParams.type) {
       case 'time' : $scope.paramType = "Timesheets";
         break;
@@ -260,7 +264,6 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
 
   ProjectService.expenses($stateParams.type, $stateParams.projectId).then(function(timesheets) {
     $scope.expenses = timesheets;
-    //console.log('ProjectExpenseCtrl -> ' + angular.toJson($scope.expenses ));
   }, function(reason) {
     console.error('promise returned error, reason -> ' + reason);
   });
@@ -272,7 +275,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   ProjectExpNewCtrl - New Time or Expense
 ===========================================================================
 */
-.controller('ProjectExpNewCtrl', ['$scope', '$rootScope', '$stateParams', '$ionicLoading', '$ionicPopup', '$ionicModal', '$location', '$cordovaBarcodeScanner', 'ProjectService', 'Camera', function($scope, $rootScope, $stateParams, $ionicLoading, $ionicPopup, $ionicModal, $location, $cordovaBarcodeScanner, ProjectService, Camera) {
+.controller('ProjectExpNewCtrl', ['$scope', '$rootScope', '$stateParams', '$ionicLoading', '$ionicPopup', '$ionicModal', '$location', '$cordovaBarcodeScanner', 'ProjectService', 'Camera', 'logger', function($scope, $rootScope, $stateParams, $ionicLoading, $ionicPopup, $ionicModal, $location, $cordovaBarcodeScanner, ProjectService, Camera, logger) {
 
   switch ($stateParams.type) {
       case 'time' :
@@ -502,7 +505,6 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
     if ($rootScope.adminLoggedIn > Date.now() - adminTimeout) {
       $location.path('tab/settings/devtools');
       $rootScope.adminLoggedIn = Date.now();
-      $scope.$apply();
     } else {
       $scope.data = {};
       var myPopup = $ionicPopup.show({
@@ -568,6 +570,31 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
       }
     });
   };
+
+  $scope.setLogLevel = function() {
+    if ($scope.log.level == "Off") {
+      localStorage.removeItem('logLevel');
+    } else {
+      localStorage.setItem('logLevel', $scope.log.level);
+    }
+    $scope.log.levelChange = false;
+  };
+
+  $scope.getLogLevel = function() {
+    var logLevel = localStorage.getItem("logLevel");
+    if (logLevel === null) {
+      logLevel = "Off";
+    }
+    return logLevel;
+  };
+
+  $scope.logLevelChange = function() {
+    $scope.log.levelChange = true;
+  };
+
+  $scope.log = {};
+  $scope.log.level = $scope.getLogLevel();
+  $scope.log.levelChange = false;
 
 }])
 

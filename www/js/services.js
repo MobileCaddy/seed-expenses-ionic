@@ -18,7 +18,12 @@ angular.module('smartStoreUtils', [])
     return mobileCaddy.require('mobileCaddy/smartStoreUtils');
 });
 
-angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnUtils', 'smartStoreUtils'])
+angular.module('logger', [])
+  .factory('logger', function() {
+    return mobileCaddy.require('mobileCaddy/logger');
+});
+
+angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnUtils', 'smartStoreUtils', 'logger'])
 
 /*
  * handles network events (online/offline) and kicks off tasks if needed
@@ -265,7 +270,7 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
                 // Unable to sync -> set a localnotification
                 NotificationService.setLocalNotification();
               } else {
-                SyncService.syncTables(['MC_Project_Location__ap', 'MC_Time_Expense__ap'], true);
+                SyncService.syncTables(['MC_Project_Location__ap', 'MC_Time_Expense__ap', 'Mobile_Log__mc'], true);
               }
           }, function(reason) {
             console.error("Angular: promise returned reason -> " + reason);
