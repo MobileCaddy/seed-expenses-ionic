@@ -1,7 +1,7 @@
 <apex:page applyHtmlTag="true" applyBodyTag="false" showHeader="false" docType="html-5.0" standardStylesheets="false"  manifest="/apex/MY_APP_CACHE_RESOURCE">
     <!--
     Need to add this controller to the apex tag
-    controller="mc_package_002.MobileCaddyStartPageController001_mc"
+    controller="mobilecaddy1.MobileCaddyStartPageController001_mc"
     -->
 
     <head>
@@ -13,6 +13,7 @@
         <!-- Your App's Resources  -->
         <!-- ===================== -->
         <script src="{!URLFOR($Resource.MY_APP_RESOURCE, 'www/lib/js/ionic.bundle.min.js')}" type="text/javascript"></script>
+        <script src="{!URLFOR($Resource.MY_APP_RESOURCE, 'www/lib/js/angular-ios9-uiwebview.patch.js')}" type="text/javascript"></script>
 
         <script src="{!URLFOR($Resource.MY_APP_RESOURCE, 'www/js/app.js')}" type="text/javascript"></script>
         <script src="{!URLFOR($Resource.MY_APP_RESOURCE, 'www/js/services.js')}" type="text/javascript"></script>

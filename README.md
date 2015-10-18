@@ -9,7 +9,6 @@ This is the basic seed application built with [Angular JS](https://angularjs.org
 * Get the code and the supporting node and packages. The following depencies are needed (For detailed instructions see the [Getting Started Guide](http://developer.mobilecaddy.net/docs));
  * npm
  * grunt-cli
- * bower
  * ruby
  * sass
 
@@ -45,9 +44,16 @@ cd seed-expenses-ionic-master
 
 ```
 npm install
-bower install
 grunt devsetup
 ```
+
+The app can be started using this command (that uses the Mobilecaddy CLI) and should be accessible on [http://localhost:3030/www/](http://localhost:3030/www/), though a browser tab should be opened automagically for you.
+
+```
+mobilecaddy serve
+```
+
+The Codeflow control panel for your application should be availble on [http://localhost:3030/codeflow/](http://localhost:3030/codeflow/).
 
 
 ## Task automation
