@@ -1,3 +1,22 @@
+### 1.0.0  (2015-10-16)
+
+
+#### Bug Fixes
+
+* NONE
+
+#### Features
+
+* New **Codeflow Control Panel**
+* No longer using bower, now using node
+* Dep bounce
+* ios9 Patch
+
+#### Breaking Changes
+
+* Use on packages only containing 'mobilecaddy1' namespace
+
+
 ### 0.0.1-alpha.6 (2015-07-15)
 
 
