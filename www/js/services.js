@@ -18,7 +18,12 @@ angular.module('smartStoreUtils', [])
     return mobileCaddy.require('mobileCaddy/smartStoreUtils');
 });
 
-angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnUtils', 'smartStoreUtils'])
+angular.module('logger', [])
+  .factory('logger', function() {
+    return mobileCaddy.require('mobileCaddy/logger');
+});
+
+angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnUtils', 'smartStoreUtils', 'logger'])
 
 .factory('FileService', ['$cordovaFile', function($cordovaFile){
   function writeFile(fileName, text) {
@@ -53,7 +58,7 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
 /*
  * handles network events (online/offline) and kicks off tasks if needed
  */
-.factory('NetworkService', ['SyncService', function(SyncService){
+.factory('NetworkService', ['SyncService', 'logger', function(SyncService, logger){
   return {
     networkEvent: function(status){
       var pastStatus = localStorage.getItem('networkStatus');
@@ -61,6 +66,7 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
         SyncService.syncTables(['MC_Project__ap', 'MC_Time_Expense__ap'], true);
       }
       localStorage.setItem('networkStatus', status);
+      logger.log("NetworkService " + status);
       return true;
     }
   };
@@ -72,14 +78,15 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
  *  then ask the user if they want to upgrade. If not then refrain from
  *  asking again for a period if time.
  */
-.factory('AppRunStatusService', ['$ionicPopup', '$ionicLoading', 'devUtils', 'vsnUtils', 'SyncService', function($ionicPopup, $ionicLoading, devUtils, vsnUtils, SyncService) {
+ .factory('AppRunStatusService', ['$ionicPopup', '$ionicLoading', 'devUtils', 'vsnUtils', 'SyncService', 'logger', function($ionicPopup, $ionicLoading, devUtils, vsnUtils, SyncService, logger) {
 
   function resume() {
     devUtils.dirtyTables().then(function(tables){
-      //console.log('AppRunStatusService resume tables',tables);
+      logger.log('on resume: dirtyTables check');
       if (tables && tables.length === 0) {
+        logger.log('on resume: calling upgradeAvailable');
         vsnUtils.upgradeAvailable().then(function(res){
-          //console.log('AppRunStatusService upgradeAvailable?',res);
+          logger.log('on resume: upgradeAvailable? ' + res);
           if (res) {
             var notificationTimeout = (1000 * 60 * 5); // 5 minutes
             var prevUpNotification = localStorage.getItem('prevUpNotification');
@@ -104,7 +111,9 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
                     template: '<h1>Upgrade app...</h1><p id="app-upgrade-msg" class="item-icon-left">Upgrading...<ion-spinner/></p>'
                   });
                   localStorage.removeItem('prevUpNotification');
+                  logger.log('on resume: calling upgradeIfAvailable');
                   vsnUtils.upgradeIfAvailable().then(function(res){
+                    logger.log('on resume: upgradeIfAvailable res = ' + res);
                     if (!res) {
                       $ionicLoading.hide();
                       $scope.data = {};
@@ -124,7 +133,7 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
                       });
                     }
                   }).catch(function(e){
-                    console.error(e);
+                    logger.error("resume " + JSON.stringify(e));
                     $ionicLoading.hide();
                   });
                 } else {
@@ -143,7 +152,7 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
 
   return {
     statusEvent: function(status){
-      //console.log('AppRunStatusService statusEvent', status);
+      logger.log('AppRunStatusService status ' + status);
       if (status == "resume") {
         resume();
       }
@@ -452,15 +461,15 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
         var timeExpense1 =  [];
         if (type == "time") {
           timeExpense1 = timeExpense.filter(function(el){
-            return (el.mc_package_002__Duration_Minutes__c !== null &&
-                    typeof(el.mc_package_002__Duration_Minutes__c) != "undefined") &&
-                    el.mc_package_002__Project__c == projectId;
+            return (el.mobilecaddy1__Duration_Minutes__c !== null &&
+                    typeof(el.mobilecaddy1__Duration_Minutes__c) != "undefined") &&
+                    el.mobilecaddy1__Project__c == projectId;
           });
         } else {
           timeExpense1 = timeExpense.filter(function(el){
-            return (el.mc_package_002__Expense_Amount__c !== null &&
-                    typeof(el.mc_package_002__Expense_Amount__c) != "undefined") &&
-                    el.mc_package_002__Project__c == projectId;
+            return (el.mobilecaddy1__Expense_Amount__c !== null &&
+                    typeof(el.mobilecaddy1__Expense_Amount__c) != "undefined") &&
+                    el.mobilecaddy1__Project__c == projectId;
           });
         }
 
@@ -479,16 +488,16 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
       var totalExpense = 0;
       var totalTime = 0;
       devUtils.readRecords('MC_Time_Expense__ap', []).then(function(resObject) {
-        var records = _.where(resObject.records, {'mc_package_002__Project__c': projectId});
+        var records = _.where(resObject.records, {'mobilecaddy1__Project__c': projectId});
         //console.log('Angular: getProjectTotals',records);
         _.each(records, function(el) {
-          if (el.mc_package_002__Duration_Minutes__c !== null &&
-              typeof(el.mc_package_002__Duration_Minutes__c) != "undefined") {
-            totalTime += el.mc_package_002__Duration_Minutes__c;
+          if (el.mobilecaddy1__Duration_Minutes__c !== null &&
+              typeof(el.mobilecaddy1__Duration_Minutes__c) != "undefined") {
+            totalTime += el.mobilecaddy1__Duration_Minutes__c;
           } else {
-            if (el.mc_package_002__Expense_Amount__c !== null &&
-                typeof(el.mc_package_002__Expense_Amount__c) != "undefined") {
-              totalExpense += el.mc_package_002__Expense_Amount__c;
+            if (el.mobilecaddy1__Expense_Amount__c !== null &&
+                typeof(el.mobilecaddy1__Expense_Amount__c) != "undefined") {
+              totalExpense += el.mobilecaddy1__Expense_Amount__c;
             }
           }
         });
@@ -513,13 +522,13 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
       //console.log('Angular: project -> ', project);
       if (typeof(project) != "undefined") {
         project = ProjectArr[0];
-        if(typeof ProjectArr[0].mc_package_002__MC_Project_Location__c != 'undefined') {
+        if(typeof ProjectArr[0].mobilecaddy1__MC_Project_Location__c != 'undefined') {
           if (locations.length <= 0) {
-            locations =  getLocations(ProjectArr[0].mc_package_002__MC_Project_Location__c);
+            locations =  getLocations(ProjectArr[0].mobilecaddy1__MC_Project_Location__c);
           }
-          ProjectArr[0].location =  getLocationFromId(ProjectArr[0].mc_package_002__MC_Project_Location__c);
+          ProjectArr[0].location =  getLocationFromId(ProjectArr[0].mobilecaddy1__MC_Project_Location__c);
         } else {
-          //console.log('Angular: no mc_package_002__MC_Project_Location__c in project');
+          //console.log('Angular: no mobilecaddy1__MC_Project_Location__c in project');
           ProjectArr[0].location = '-';
         }
       }
@@ -745,6 +754,8 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
       function(tableNames) {
           $j.each(tableNames, function(i,tableName) {
             tables.push({'Name' : tableName});
+            // TODO :: make this a promise ?
+            // TODO :: Improve this, add a meta table?
             smartStoreUtils.getTableDefnColumnValue(
               tableName,
               'Snapshot Data Required',
@@ -771,7 +782,7 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
           return deferred.promise;
         },
       function(e) {
-        //console.log(': error from listMobileTables -> ' + angular.toJson(e));
+        console.log('MC: error from listMobileTables -> ' + angular.toJson(e));
         deferred.reject(e);
       });
     return deferred.promise;
@@ -813,6 +824,57 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
     return deferred.promise;
   }
 
+  function getRecordForSoupEntryId(tableName, soupRecordId) {
+    return new Promise(function(resolve, reject) {
+      devUtils.readRecords(tableName, []).then(function(resObject) {
+        var record = _.findWhere(resObject.records, {'_soupEntryId': soupRecordId});
+        resolve(record);
+      }).catch(function(resObject){
+        reject(resObject);
+      });
+    });
+  }
+
+  function insertRecordUsingSmartStoreUtils(tableName, rec) {
+    return new Promise(function(resolve, reject) {
+      smartStoreUtils.insertRecords(tableName, [rec],
+        function(res) {
+          resolve(res);
+        },
+        function(err) {
+          reject(err);
+        }
+      );
+    });
+  }
+
+  function insertMobileLog(recs) {
+    return new Promise(function(resolve, reject) {
+      var remainingData = JSON.stringify(recs);
+      var dataToInsert = [];
+      // Push 'chunks' of data to array for processing further down
+      while (remainingData.length > 0) {
+        dataToInsert.push(remainingData.substring(0,32767));
+        remainingData = remainingData.substring(32767);
+      }
+      // Iterate over the data 'chunks', inserting each 'chunk' into the Mobile_Log_mc table
+      var sequence = Promise.resolve();
+      dataToInsert.forEach(function(data){
+        sequence = sequence.then(function() {
+          var mobileLog = {};
+          mobileLog.Name = "TMP-" + new Date().valueOf();
+          mobileLog.mobilecaddy1__Error_Text__c = data;
+          mobileLog.SystemModstamp = new Date().getTime();
+          return insertRecordUsingSmartStoreUtils('Mobile_Log__mc', mobileLog);
+        }).then(function(resObject) {
+          resolve(resObject);
+        }).catch(function(res){
+          reject(res);
+        });
+      });
+    });
+  }
+
   return {
     allTables: function() {
       return getTables();
@@ -833,11 +895,16 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
           }
       }
       return tableRecs;
+    },
+    getRecordForSoupEntryId: function(tableName, soupRecordId) {
+      return getRecordForSoupEntryId(tableName, soupRecordId);
+    },
+    insertMobileLog: function(recs) {
+      return insertMobileLog(recs);
     }
   };
 
 }])
-
 
 .factory('DeployService', ['$rootScope', '$q', '$timeout', '$http', function($rootScope, $q, $timeout, $http) {
 
@@ -865,7 +932,7 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
         path: '/services/data/' + apiVersion + '/tooling/query/?q=select Id, Name, Description, LastModifiedDate from StaticResource WHERE Name=\'' + dataName + '\' LIMIT 1'
       },
       function(response) {
-          //console.log('response' , response);
+          console.debug('response' , response);
           resolve(response);
       },
       function(error) {
@@ -886,7 +953,7 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
         path: '/services/data/' + apiVersion + '/tooling/query/?q=select Id, Name, Description, LastModifiedDate from ApexPage WHERE Name=\'' + pageName + '\' LIMIT 1'
       },
       function(response) {
-          //console.log('response' , response);
+          console.debug('response' , response);
           resolve(response);
       },
       function(error) {
@@ -931,7 +998,7 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
     doesBundleExist(appConfig).then(function(response){
       if (response.records.length > 0) {
         // Update existing resource
-        //console.log('resource exists... patching existing');
+        console.debug('resource exists... patching existing');
         var existingSR = response.records[0];
         force.request(
           {
@@ -943,7 +1010,7 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
             }
           },
           function(response) {
-              //console.log('response' , response);
+              console.debug('response' , response);
               resolve('Existing app bundle updated');
           },
           function(error) {
@@ -967,7 +1034,7 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
             }
           },
           function(response) {
-            //console.log('response' , response);
+            console.debug('response' , response);
             resolve('App bundle uploaded');
           },
           function(error) {
@@ -995,7 +1062,7 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
           doesPageExist(dataName).then(function(response){
             if (response.records.length > 0) {
                // Update existing resource
-              //console.log('page exists... patching existing');
+              console.debug('page exists... patching existing');
               var existingPage = response.records[0];
               force.request(
                 {

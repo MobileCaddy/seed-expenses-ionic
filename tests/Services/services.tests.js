@@ -32,20 +32,20 @@ describe('ProjectService Unit Tests', function(){
       {
         "Id" : "0011100000g0Fe9AAE",
         "Name" : "Project 1",
-        "mc_package_002__Description__c" : "desc1",
-        "mc_package_002__MC_Project_Location__c" : "a2zR0000000NaqSIAS"
+        "mobilecaddy1__Description__c" : "desc1",
+        "mobilecaddy1__MC_Project_Location__c" : "a2zR0000000NaqSIAS"
       },
       {
         "Id" : "0011100000hkruTAAQ",
         "Name" : "Project 2",
-        "mc_package_002__Description__c" : "desc2",
-        "mc_package_002__MC_Project_Location__c" : "a2zR0000000NaudIAC"
+        "mobilecaddy1__Description__c" : "desc2",
+        "mobilecaddy1__MC_Project_Location__c" : "a2zR0000000NaudIAC"
       },
       {
         "Id" : "0011100000hks4iAAA",
         "Name" : "Project 3",
-        "mc_package_002__Description__c" : "desc3",
-        "mc_package_002__MC_Project_Location__c" : "a2zR0000000NaqSIAS"
+        "mobilecaddy1__Description__c" : "desc3",
+        "mobilecaddy1__MC_Project_Location__c" : "a2zR0000000NaqSIAS"
       }
     ];
 
@@ -57,26 +57,26 @@ describe('ProjectService Unit Tests', function(){
   var myExpenses = [
       {
         "Approved__c" : "Awaiting",
-        "mc_package_002__Project__c" : "0011100000g0Fe9AAE",
-        "mc_package_002__Duration_Minutes__c" : 30,
-        "mc_package_002__Expense_Amount__c" : null,
-        "mc_package_002__Short_Description__c" : "Time 1",
+        "mobilecaddy1__Project__c" : "0011100000g0Fe9AAE",
+        "mobilecaddy1__Duration_Minutes__c" : 30,
+        "mobilecaddy1__Expense_Amount__c" : null,
+        "mobilecaddy1__Short_Description__c" : "Time 1",
         "Name" : "TAE-005686"
       },
       {
         "Approved__c" : "Awaiting",
-        "mc_package_002__Project__c" : "0011100000g0Fe9AAE",
-        "mc_package_002__Duration_Minutes__c" : null,
-        "mc_package_002__Expense_Amount__c" : 10,
-        "mc_package_002__Short_Description__c" : "Expense 1",
+        "mobilecaddy1__Project__c" : "0011100000g0Fe9AAE",
+        "mobilecaddy1__Duration_Minutes__c" : null,
+        "mobilecaddy1__Expense_Amount__c" : 10,
+        "mobilecaddy1__Short_Description__c" : "Expense 1",
         "Name" : "TAE-005687"
       },
       {
         "Approved__c" : "Awaiting",
-        "mc_package_002__Project__c" : "0011100000g0Fe9AAE",
-        "mc_package_002__Duration_Minutes__c" : null,
-        "mc_package_002__Expense_Amount__c" : 20,
-        "mc_package_002__Short_Description__c" : "Expense 2",
+        "mobilecaddy1__Project__c" : "0011100000g0Fe9AAE",
+        "mobilecaddy1__Duration_Minutes__c" : null,
+        "mobilecaddy1__Expense_Amount__c" : 20,
+        "mobilecaddy1__Short_Description__c" : "Expense 2",
         "Name" : "TAE-005688"
       }
     ]

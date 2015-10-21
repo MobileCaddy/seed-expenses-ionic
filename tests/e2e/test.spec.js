@@ -41,7 +41,7 @@ describe("Projects", function() {
     expect(browser.getTitle()).toEqual('Timesheets');
     var timesheets = element.all(by.repeater('record in expenses'));
     expect(timesheets.count()).toEqual(2);
-    expect(timesheets.first().element(by.binding('record.mc_package_002__Short_Description__c')).getText()).toEqual('Hooking up cats');
+    expect(timesheets.first().element(by.binding('record.mobilecaddy1__Short_Description__c')).getText()).toEqual('Hooking up cats');
     expect(timesheets.first().element(by.tagName('p')).getText()).toContain('30 minutes');
     expect(timesheets.first().element(by.tagName('p')).getText()).toContain('TAE-005686');
     browser.navigate().back();
@@ -55,7 +55,7 @@ describe("Projects", function() {
     expect(browser.getTitle()).toEqual('Expenses');
     var timesheets = element.all(by.repeater('record in expenses'));
     expect(timesheets.count()).toEqual(1);
-    expect(timesheets.first().element(by.binding('record.mc_package_002__Short_Description__c')).getText()).toEqual('Coffee and toast');
+    expect(timesheets.first().element(by.binding('record.mobilecaddy1__Short_Description__c')).getText()).toEqual('Coffee and toast');
     expect(timesheets.first().element(by.tagName('p')).getText()).toContain('£8');
     expect(timesheets.first().element(by.tagName('p')).getText()).toContain('TAE-005686');
     browser.navigate().back();
@@ -97,7 +97,7 @@ describe("Projects", function() {
     expect(browser.getTitle()).toEqual('Timesheets');
     var timesheets = element.all(by.repeater('record in expenses'));
     expect(timesheets.count()).toEqual(3);
-    expect(timesheets.last().element(by.binding('record.mc_package_002__Short_Description__c')).getText()).toEqual('test expense');
+    expect(timesheets.last().element(by.binding('record.mobilecaddy1__Short_Description__c')).getText()).toEqual('test expense');
     expect(timesheets.last().element(by.tagName('p')).getText()).toContain('123');
     browser.navigate().back();
   });
