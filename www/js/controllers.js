@@ -191,7 +191,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   });
 
   $scope.project = ProjectService.get($stateParams.projectId);
-  $scope.project.formDescription = $scope.project.mc_package_002__Description__c;
+  $scope.project.formDescription = $scope.project.mobilecaddy1__Description__c;
 
   getProjectTotals();
 
@@ -230,7 +230,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
     });
     var newProj = {};
     newProj.Id = $scope.project.Id;
-    newProj.mc_package_002__Description__c  = $scope.project.formDescription;
+    newProj.mobilecaddy1__Description__c  = $scope.project.formDescription;
     //console.log('update, project -> ' + angular.toJson(newProj));
     ProjectService.update(newProj).then(function(retObject) {
       //console.log('update, retObject -> ' + angular.toJson(retObject));
@@ -292,16 +292,16 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
    */
   $scope.submitForm = function() {
     varNewExp = {
-      "mc_package_002__Short_Description__c": $scope.expenseForm.description.$modelValue,
+      "mobilecaddy1__Short_Description__c": $scope.expenseForm.description.$modelValue,
       "Name": 'TMP-' + Date.now(),
-      "mc_package_002__Project__c": $stateParams.projectId
+      "mobilecaddy1__Project__c": $stateParams.projectId
     };
     switch ($stateParams.type) {
       case 'time' :
-        varNewExp.mc_package_002__Duration_Minutes__c = $scope.expenseForm.expenseValue.$modelValue;
+        varNewExp.mobilecaddy1__Duration_Minutes__c = $scope.expenseForm.expenseValue.$modelValue;
         break;
       default :
-        varNewExp.mc_package_002__Expense_Amount__c = $scope.expenseForm.expenseValue.$modelValue;
+        varNewExp.mobilecaddy1__Expense_Amount__c = $scope.expenseForm.expenseValue.$modelValue;
     }
     //console.log('ProjectExpNewCtrl, varNewExp -> ' + angular.toJson(varNewExp));
     $ionicLoading.show({
@@ -358,7 +358,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
 
 }])
 
- /*
+  /*
   ===========================================================================
     M O B I L C A D D Y     S E T T I N G S
   ===========================================================================
@@ -366,27 +366,35 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
 
 .controller('SettingsHBCtrl', ['$scope', '$rootScope', 'DevService', 'NetworkService', function($scope, $rootScope, DevService, NetworkService) {
 
-  if (localStorage.connection) {
-    $scope.heartbeatStatus = localStorage.connection;
-  } else {
-    $scope.heartbeatStatus = 100100;
-  }
+    if (localStorage.connection) {
+      $scope.heartbeatStatus = localStorage.connection;
+    } else {
+      $scope.heartbeatStatus = 100100;
+    }
 
-  $scope.hbUpdate = function() {
-    localStorage.connection = $scope.heartbeatStatus;
-    if ($scope.heartbeatStatus == 100100) NetworkService.networkEvent('online');
-    if ($scope.heartbeatStatus == 100103) NetworkService.networkEvent('offline');
-  };
+    $scope.hbUpdate = function() {
+      localStorage.connection = $scope.heartbeatStatus;
+      if ($scope.heartbeatStatus == 100100) NetworkService.networkEvent('online');
+      if ($scope.heartbeatStatus == 100103) NetworkService.networkEvent('offline');
+    };
 
 }])
 
-.controller('SettingsCtrl', ['$scope', '$rootScope', '$ionicPopup', '$ionicLoading', '$location', 'devUtils', 'vsnUtils', 'DevService', 'ProjectService', function($scope, $rootScope, $ionicPopup, $ionicLoading, $location, devUtils, vsnUtils, DevService, ProjectService) {
+.controller('SettingsCtrl', ['$scope', '$rootScope', '$ionicPopup', '$ionicLoading', '$location', 'devUtils', 'vsnUtils', 'DevService', 'logger', function($scope, $rootScope, $ionicPopup, $ionicLoading, $location, devUtils, vsnUtils, DevService, logger) {
 
   /*
   ---------------------------------------------------------------------------
     Main settings page
   ---------------------------------------------------------------------------
   */
+
+  // This unhides the nav-bar. The navbar is hidden in the cases where we want a
+  // splash screen, such as in this app
+  // NOTE - you will want to add the following two lines to the controller that
+  // is first called by your app.
+  e = document.getElementById('my-nav-bar');
+  angular.element(e).removeClass( "mc-hide" );
+
   $scope.logoutAllowedClass = 'disabled';
   $scope.recsToSyncCount = 0;
 
@@ -411,7 +419,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
       $scope.recsToSyncCount  = 0;
     }
   }, function(reason) {
-    console.error('promise returned reason -> ' + reason);
+    console.error('Angular: promise returned reason -> ' + reason);
   });
 
 
@@ -419,7 +427,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
     .then(function(appSoupRecs) {
     $scope.settingsRecs = extractSettingsValues(appSoupRecs);
   }, function(reason) {
-    console.error('promise returned reason -> ' + reason);
+    console.error('Angular: promise returned reason -> ' + reason);
   });
 
   function extractSettingsValues(appSoupRecs) {
@@ -453,7 +461,9 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
 
   $scope.upgradeIfAvailable = function() {
     devUtils.dirtyTables().then(function(tables){
+      logger.log('upgrade: dirtyTables check');
       if (tables && tables.length === 0) {
+        logger.log('upgrade: no dirtyTables');
         var confirmPopup = $ionicPopup.confirm({
           title: 'Upgrade',
           template: 'Are you sure you want to upgrade now?'
@@ -467,7 +477,9 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
               noBackdrop: true,
               template: '<h1>Upgrade app...</h1><p id="app-upgrade-msg" class="item-icon-left">Upgrading...<ion-spinner/></p>'
             });
+            logger.log('upgrade: calling upgradeIfAvailable');
             vsnUtils.upgradeIfAvailable().then(function(res){
+              logger.log('upgrade: upgradeIfAvailable? ' + res);
               if (!res) {
                 $ionicLoading.hide();
                 $scope.data = {};
@@ -487,12 +499,13 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
                 });
               }
             }).catch(function(e){
-              console.error(e);
+              logger.error('upgrade: ' + JSON.stringify(e));
               $ionicLoading.hide();
             });
           }
         });
       } else {
+        logger.log('upgrade: dirtyTables found');
         $scope.data = {};
         $ionicPopup.show({
           title: 'Upgrade',
@@ -519,7 +532,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   */
   $scope.showAdminPasswordPopup = function() {
     var adminTimeout = (1000 * 60 * 5); // 5 minutes
-    if ($rootScope.adminLoggedIn > Date.now() - adminTimeout) {
+    if ( $rootScope.adminLoggedIn > Date.now() - adminTimeout) {
       $location.path('tab/settings/devtools');
       $rootScope.adminLoggedIn = Date.now();
     } else {
@@ -537,7 +550,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
                 $location.path('tab/settings/devtools');
                 $rootScope.adminLoggedIn = Date.now();
               } else {
-                //console.log("Password incorrect");
+                console.log("Password incorrect");
               }
             }
           },
@@ -559,7 +572,6 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
    });
   };
 
-
   $scope.showConfirmReset = function() {
     var confirmPopup = $ionicPopup.confirm({
       title: 'Reset App Data',
@@ -567,8 +579,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
     });
     confirmPopup.then(function(res) {
       if(res) {
-        //console.log("Resetting app");
-        var vsnUtils = mobileCaddy.require('mobileCaddy/vsnUtils');
+        console.debug("Resetting app");
         var i;
         var name;
         $ionicLoading.show({
@@ -605,44 +616,22 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
     return logLevel;
   };
 
-  $scope.logLevelChange = function() {
-    $scope.log.levelChange = true;
-  };
-
   $scope.log = {};
   $scope.log.level = $scope.getLogLevel();
   $scope.log.levelChange = false;
 
+  $scope.logLevelChange = function() {
+    $scope.log.levelChange = true;
+  };
+
 }])
 
 
-.controller('TestingCtrl', ['$scope', '$cordovaLocalNotification', 'AppRunStatusService', 'NotificationService', function($scope, $cordovaLocalNotification, AppRunStatusService, NotificationService) {
+.controller('TestingCtrl', ['$scope', 'AppRunStatusService', function($scope, AppRunStatusService) {
 
   $scope.resumeEvent = function() {
-    //console.log("resumeEvent");
+    console.debug("resumeEvent");
     AppRunStatusService.statusEvent('resume');
-  };
-
-  $scope.localNotification = function(id) {
-    var alarmTime = new Date();
-    alarmTime.setSeconds(alarmTime.getSeconds() + 15);
-    var args = {
-      id: 100100,
-      at: alarmTime,
-      title: "Unsynced records",
-      text: "Unsynced records on device",
-      sound: null};
-    if(device.platform == "Android") {
-       args.ongoing = true;
-       args.smallIcon = "res://icon";
-    }
-    $cordovaLocalNotification.schedule(args).then(function () {
-      //console.log("The notification 100100 has been set for 15 seconds");
-    }) ;
-  };
-
-  $scope.localNotificationTrigger = function(id) {
-    NotificationService.handleLocalNotification(id, 'foreground');
   };
 
 }])
@@ -652,7 +641,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   MTI (Mobile Table Inspector)
 ---------------------------------------------------------------------------
 */
-.controller('MTICtrl', ['$scope', '$rootScope', '$location', '$ionicPopup', 'DevService', function($scope, $rootScope, $location, $ionicPopup, DevService) {
+.controller('MTICtrl', ['$scope', '$rootScope', '$location', '$ionicPopup', '$ionicLoading', 'DevService', 'devUtils', 'logger', function($scope, $rootScope, $location, $ionicPopup, $ionicLoading, DevService, devUtils, logger) {
 
   var adminTimeout = (1000 * 60 *5 ); // 5 minutes
   if ( $rootScope.adminLoggedIn > Date.now() - adminTimeout) {
@@ -670,32 +659,143 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   DevService.allTables().then(function(tables) {
     $scope.tables = tables;
   }, function(reason) {
-    console.error('promise returned reason -> ' + reason);
+    console.error('Angular: promise returned reason -> ' + reason);
   });
+
+  $scope.showTable = function(tableName) {
+    $location.path(decodeURIComponent("/tab/settings/mti/" + tableName));
+  };
+
+  $scope.syncTable = function(tableName) {
+    var confirmPopup = $ionicPopup.confirm({
+      title: 'Sync Table',
+      template: "<div style='text-align:center;'>Are you sure you want to sync " + tableName + "?</div>",
+      cancelText: 'No',
+      okText: 'Yes',
+    });
+    confirmPopup.then(function(res) {
+      if (res) {
+        $ionicLoading.show({
+          duration: 10000,
+          template: 'Syncing ' + tableName + " ..."
+        });
+        devUtils.syncMobileTable(tableName).then(function(resObject){
+          $ionicLoading.hide();
+        }).catch(function(e){
+          logger.error('syncTable from settings ' + tableName + " " + JSON.stringify(e));
+          $ionicLoading.hide();
+          var alertPopup = $ionicPopup.alert({
+            title: 'Operation failed!',
+            template: '<p>Sorry, something went wrong.</p><p class="error_details">Error: ' + e.status + ' - ' + e.mc_add_status + '</p>'
+          });
+        });
+      }
+    });
+  };
+
+  $scope.saveTableToML = function(tableName) {
+    var confirmPopup = $ionicPopup.confirm({
+      title: 'Save Table To Mobile Log',
+      template: "<div style='text-align:center;'>Are you sure you want to save " + tableName + "?</div>",
+      cancelText: 'No',
+      okText: 'Yes',
+    });
+    confirmPopup.then(function(res) {
+      if (res) {
+        $ionicLoading.show({
+          duration: 10000,
+          template: 'Saving ' + tableName + " ..."
+        });
+        // Read the table records
+        DevService.allRecords(tableName, false).then(function(tableRecs) {
+          // console.log("tableRecs",angular.toJson(tableRecs));
+          return DevService.insertMobileLog(tableRecs);
+        }).then(function(resObject) {
+          // console.log("mc resObject",resObject);
+          $ionicLoading.hide();
+        }).catch(function(e){
+          logger.error('saveTableToML ' + tableName + " " + JSON.stringify(e));
+          $ionicLoading.hide();
+          var alertPopup = $ionicPopup.alert({
+            title: 'Operation failed!',
+            template: '<p>Sorry, something went wrong.</p><p class="error_details">Error: ' + e.status + ' - ' + e.mc_add_status + '</p>'
+          });
+        });
+      }
+    });
+  };
 
 }])
 
-.controller('MTIDetailCtrl', ['$scope', '$rootScope', '$stateParams', '$ionicLoading', 'DevService', function($scope, $rootScope,$stateParams, $ionicLoading, DevService) {
+.controller('MTIDetailCtrl', ['$scope', '$rootScope', '$stateParams', '$ionicLoading', '$ionicModal', 'DevService', function($scope, $rootScope,$stateParams, $ionicLoading, $ionicModal, DevService) {
+
   $ionicLoading.show({
-    duration: 30000,
-    delay : 400,
-    noBackdrop: true,
-    template: '<p id="app-progress-msg" class="item-icon-left">Fetching records...<ion-spinner/></p>'
-  });
+      duration: 30000,
+      noBackdrop: true,
+      template: '<p id="app-progress-msg" class="item-icon-left"><i class="icon ion-loading-c"></i>Fetching records...</p>'
+    });
   $scope.table = {'Name': $stateParams.tableName};
   DevService.allRecords($stateParams.tableName, false)
     .then(function(tableRecs) {
     $scope.tableRecs = tableRecs;
     $ionicLoading.hide();
   }, function(reason) {
-    console.error('promise returned error -> ' + reason);
+    console.error('Angular: promise returned error -> ' + reason);
   });
 
   $scope.getItemHeight = function(item, index) {
     return (typeof(item) != "undefined")  ? 100 + item.length*55 : 0;
   };
-}])
 
+  $scope.search = {};
+
+  $scope.clearSearch = function() {
+    $scope.search.query = "";
+  };
+
+  $scope.showRecord = function(tableRec, soupRecordId) {
+    $ionicLoading.show({
+      duration: 10000,
+      template: 'Loading...'
+    });
+    var tableName;
+    for (i = 0, len = tableRec.length; i < len; i++) {
+      if (tableRec[i].Name == "Mobile_Table_Name") {
+        tableName = tableRec[i].Value;
+      }
+    }
+    console.log("tableName",tableName, soupRecordId);
+    DevService.getRecordForSoupEntryId(tableName, soupRecordId).then(function(record) {
+      console.log("record",record);
+      $scope.showTableRecord(tableName, record, soupRecordId);
+      $ionicLoading.hide();
+    }, function(reason) {
+      $ionicLoading.hide();
+      console.error('getRecordForSoupEntryId ' + reason);
+    });
+  };
+
+  $scope.showTableRecord = function(tableName, record, soupRecordId) {
+    $ionicModal.fromTemplateUrl('settingDevMTITableRecord.html', function(modal) {
+      $scope.tableRecordModal = modal;
+      $scope.tableRecordModal.tableName = tableName;
+      $scope.tableRecordModal.record = record;
+      $scope.tableRecordModal.soupRecordId = soupRecordId;
+      $scope.tableRecordModal.show();
+    }, {
+      scope: $scope,
+      animation: 'slide-in-up',
+      backdropClickToClose : false
+    });
+  };
+
+  $scope.closeShowTableRecord = function() {
+    $scope.tableRecordModal.hide();
+    $scope.tableRecordModal.remove();
+    delete $scope.tableRecordModal;
+  };
+
+}])
 
 /*
 ---------------------------------------------------------------------------
@@ -719,7 +819,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   $scope.messages = messages;
 
   DeployService.getDetails().then(function(data){
-    //console.log('data', data);
+    console.log('data', data);
     appConfig = data;
     return DeployService.deployBunlde(appConfig);
   }).then(function(res){
@@ -757,7 +857,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
         $scope.messages.push(msg);
       }
     });
-    //console.log(err);
+    console.debug(err);
   });
 }])
 

@@ -4,11 +4,11 @@
     <ion-list>
       <div class="list list-inset">
         <ion-item ng-repeat="record in expenses" type="item-text-wrap">
-          <h3>{{record.mc_package_002__Short_Description__c}}</h3>
+          <h3>{{record.mobilecaddy1__Short_Description__c}}</h3>
           <p>
            <span ng-switch="paramType">
-             <span name="timesheetspan" ng-switch-when="Timesheets">{{record.mc_package_002__Duration_Minutes__c}} minutes</span>
-             <span ng-switch-when="Expenses">£{{record.mc_package_002__Expense_Amount__c}}</span>
+             <span name="timesheetspan" ng-switch-when="Timesheets">{{record.mobilecaddy1__Duration_Minutes__c}} minutes</span>
+             <span ng-switch-when="Expenses">£{{record.mobilecaddy1__Expense_Amount__c}}</span>
            </span>
            </br>ID: {{record.Name}}
           </p>

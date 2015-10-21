@@ -37,7 +37,6 @@ module.exports = function(grunt) {
       },
       dev: {
         src: ['www/**',
-              'www/lib/js/ng-cordova.min.js',
               // don't include  files that are needed only for local dev/test
               '!www/index.html',
               '!www/**/*.log'],
@@ -101,8 +100,7 @@ module.exports = function(grunt) {
       },
       dev: {
         options: {
-          args: expressArgs,
-          script: 'bower_components/mobilecaddy-codeflow/js/cors-server.js'
+          script: 'node_modules/mobilecaddy-codeflow/js/cors-server.js'
         }
       }
     },
@@ -153,31 +151,34 @@ module.exports = function(grunt) {
           {
             expand: true,
             flatten: true,
-            src: ['bower_components/ionic/release/js/ionic.bundle.min.js'],
+            src: ['node_modules/ionic-sdk/release/js/ionic.bundle.min.js',
+                  'node_modules/ng-cordova/dist/ng-cordova.min.js'],
             dest: 'www/lib/js',
             filter: 'isFile'
           },
           // Ionic scss
           {
             expand: true,
-            cwd: 'bower_components/ionic/scss/',
+            cwd: 'node_modules/ionic-sdk/scss/',
             src: ['**'],
             dest: 'scss/ionic'
           },
           // Ionic fonts
           {
             expand: true,
-            cwd: 'bower_components/ionic/release/fonts/',
+            cwd: 'node_modules/ionic-sdk/release/fonts/',
             src: ['**'],
             dest: 'www/fonts'
           },
           {
-            src: ['bower_components/forcejs/oauthcallback.html'],
+            src: ['node_modules/mobilecaddy-codeflow/node_modules/forcejs/oauthcallback.html'],
             dest: 'oauthcallback.html'
           },
           {
-            src: 'bower_components/ngCordova/dist/ng-cordova.min.js',
-            dest: 'www/lib/js/ng-cordova.min.js'
+            expand: true,
+            cwd: 'node_modules/mobilecaddy-codeflow/codeflow-app/',
+            src: ['**'],
+            dest: 'codeflow'
           }
         ]
       }
@@ -193,7 +194,7 @@ module.exports = function(grunt) {
         }]
       },
       ngCordovaMocks: {
-        src: ['bower_components/ngCordova/dist/ng-cordova-mocks.js'],
+        src: ['node_modules/ng-cordova/dist/ng-cordova-mocks.js'],
         dest: 'tmp/ng-cordova-mocks.js',
         replacements: [{
           from: 'ngCordovaMocks',
@@ -207,7 +208,6 @@ module.exports = function(grunt) {
         configFile: 'tests/my.conf.js'
       }
     }
-
 
   });
   // Each plugin must be loaded following this pattern

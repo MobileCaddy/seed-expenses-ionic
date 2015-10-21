@@ -7,6 +7,7 @@
 node_modules
 bower_components
 tmp
+codeflow
 dest
 www/js/*.log
 .sass-cache
@@ -16,8 +17,8 @@ www/css/app.css
 www/css/app.css.map
 
 # Mock and bower stuff
-www/lib/js/*
+www/lib/js/ionic.bundle.min.js
+www/lib/js/ng-cordova.min.js
 www/fonts/ionicons*
 scss/ionic
 oauthcallback.html
-
