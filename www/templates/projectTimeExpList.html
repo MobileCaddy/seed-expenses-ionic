@@ -1,6 +1,6 @@
- <ion-view title="{{paramType}}">
+ <ion-view title="{{title}}">
   <ion-content>
-    <ion-item ng-show="expenses.length==0">No records.</ion-item>
+    <ion-item ng-show="expenses.length==0">{{'NO_RECORDS' | translate}}</ion-item>
     <ion-list>
       <div class="list list-inset">
         <ion-item ng-repeat="record in expenses" type="item-text-wrap">

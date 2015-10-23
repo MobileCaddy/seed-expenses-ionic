@@ -51,13 +51,15 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', '
   });
 }])
 
-.config(['$stateProvider', '$urlRouterProvider', '$ionicConfigProvider', function($stateProvider, $urlRouterProvider, $ionicConfigProvider) {
+.config(['$stateProvider', '$urlRouterProvider', '$ionicConfigProvider', '$translateProvider', function($stateProvider, $urlRouterProvider, $ionicConfigProvider, $translateProvider) {
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
   // Set up the various states which the app can be in.
   // Each state's controller can be found in controllers.js
 
   $ionicConfigProvider.tabs.position('bottom');
+
+  // $ionicConfigProvider.views.transition('none');
 
   $stateProvider
 
@@ -176,6 +178,74 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', '
 
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/tab/projects');
+
+  // Translations
+  $translateProvider.translations('en', {
+    'TITLE_PROJECTS': 'Projects',
+    'SETTINGS': 'Settings',
+    'LOADING': 'Loading...',
+    'FETCHING_PROJECTS': 'Fetching Projects...',
+    'SYNCING': 'Syncing...',
+    'REFRESH_AND_SYNC': 'Refresh and Sync',
+    'NO_RECS_TO_SYNC': 'No device records to sync...',
+    'SYNC_IN_PROGRESS': 'Sync already in progress...',
+    'PLEASE_CONNECT': 'Please connect before syncing',
+    'TIMESHEETS': 'Timesheets',
+    'EXPENSES': 'Expenses',
+    'EXPENSE': 'Expense',
+    'NEW_TIMESHEET': 'New Timesheet',
+    'NEW_EXPENSE': 'New Expense',
+    'NO_RECORDS': 'No Records.',
+    'TIME': 'Time',
+    'LOCATION': 'Location',
+    'SAVE': 'Save',
+    'VIEW_TIMESHEETS': 'View Timesheet Records',
+    'VIEW_EXPENSES': 'View Expense Records',
+    'CURRENCY_SYMBOL': '£',
+    'HOURS_ABBREV': 'h',
+    'MINUTES_ABBREV': 'm',
+    'CANCEL': 'Cancel',
+    'SUBMIT': 'Submit',
+    'NEW_REC_DESCRIPTION': 'Description',
+    'TIMESHEET_DESC': 'Duration in minutes',
+    'TIMESHEET_DESC_PLACEHOLDER': 'What did you spend time doing?',
+    'EXPENSE_DESC': 'How much was it?',
+    'EXPENSE_DESC_PLACEHOLDER': 'What did you spend money on?'
+  });
+  $translateProvider.translations('he', {
+    'TITLE_PROJECTS': 'פרויקטים',
+    'SETTINGS': 'הגדרות',
+    'LOADING': 'טְעִינָה ...',
+    'FETCHING_PROJECTS': 'מקסים פרויקטים ...',
+    'SYNCING': 'מסנכרן ...',
+    'REFRESH_AND_SYNC': 'רענן וסנכרון',
+    'NO_RECS_TO_SYNC': 'לא רשומות מכשיר לסינכרון ...',
+    'SYNC_IN_PROGRESS': 'סנכרון כבר בהתקדמות ...',
+    'PLEASE_CONNECT': 'אנא להתחבר לפני סינכרון',
+    'TIMESHEETS': 'גליונות',
+    'EXPENSES': 'הוצאות',
+    'EXPENSE': 'חשבון',
+    'NEW_TIMESHEET': 'גליון חדש',
+    'NEW_EXPENSE': 'הוצאות חדשות',
+    'NO_RECORDS': 'אין רשומות.',
+    'TIME': 'זמן',
+    'LOCATION': 'מיקום',
+    'SAVE': 'שמור',
+    'VIEW_TIMESHEETS': 'רשומות גליון צפה',
+    'VIEW_EXPENSES': 'רשומות תצוגת הוצאות',
+    'CURRENCY_SYMBOL': '£',
+    'HOURS_ABBREV': 'שעות',
+    'MINUTES_ABBREV': 'דקות',
+    'CANCEL': 'לבטל',
+    'SUBMIT': 'שלח',
+    'NEW_REC_DESCRIPTION': 'תיאור',
+    'TIMESHEET_DESC': 'משך בדקות',
+    'TIMESHEET_DESC_PLACEHOLDER': 'מה אתה מבזבז את הזמן עושה?',
+    'EXPENSE_DESC': 'כמה זה היה?',
+    'EXPENSE_DESC_PLACEHOLDER': 'מה עשה לך להוציא כסף על?'
+  });
+
+  $translateProvider.preferredLanguage('he');
 
 }]);
 

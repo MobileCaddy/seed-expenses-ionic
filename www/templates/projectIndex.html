@@ -1,12 +1,18 @@
- <ion-view title="Projects">
+ <ion-view title="{{'TITLE_PROJECTS' | translate}}">
   <ion-content>
-    <div class="item item-input search-input">
-      <i class="icon ion-search placeholder-icon"></i>
-      <input type="search" ng-model="search.query" />
-      <button ng-if="search.query.length"
-        class="button button-icon ion-android-close search-clear-button"
-        ng-click="clearSearch()">
-      </button>
+    <div class="row center">
+      <div class="col text-right">
+        <div class="item-input search-input">
+          <i class="icon ion-search placeholder-icon"></i>
+          <input type="search" ng-model="search.query" />
+        </div>
+      </div>
+      <div class="col text-left">
+        <button ng-if="search.query.length"
+          class="button button-icon ion-android-close search-clear-button"
+          ng-click="clearSearch()">
+        </button>
+      </div>
     </div>
     <ion-refresher on-refresh="doRefreshFromPulldown()"
                    pulling-text="Pull to refresh">
