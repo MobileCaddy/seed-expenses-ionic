@@ -1,4 +1,4 @@
-angular.module('starter.controllers', ['ionic', 'ngCordova'])
+angular.module('starter.controllers', ['ionic', 'ngCordova', 'pascalprecht.translate'])
 
 /*
 ===========================================================================
@@ -26,7 +26,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   ProjectIndexCtrl
 ===========================================================================
 */
-.controller('ProjectIndexCtrl', ['$scope', '$rootScope', '$ionicLoading', '$interval', '$timeout', 'ProjectService', 'SyncService', 'devUtils', function($scope, $rootScope, $ionicLoading, $interval, $timeout, ProjectService, SyncService, devUtils) {
+.controller('ProjectIndexCtrl', ['$scope', '$rootScope', '$ionicLoading', '$interval', '$timeout', 'ProjectService', 'SyncService', 'devUtils', '$translate', function($scope, $rootScope, $ionicLoading, $interval, $timeout, ProjectService, SyncService, devUtils, $translate) {
 
   // By default, 'ion-view's are cached - so this code will only run once.
   // Use 'cache-view="false"' in the view if you want the controller code to run every time.
@@ -55,12 +55,15 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
 
   // Setup the loader and starting templates
   if (typeof($rootScope.child) == "undefined") {
-    $ionicLoading.show({
-      duration: 30000,
-      delay : 400,
-      maxWidth: 600,
-      noBackdrop: true,
-      template: '<h1>Loading...</h1><p id="app-progress-msg" class="item-icon-left">Fetching Projects...<ion-spinner/></p>'
+    $translate(['LOADING','FETCHING_PROJECTS']).then(function (translations) {
+      var template = '<h1>' + translations.LOADING + '</h1><p id="app-progress-msg" class="item-icon-left">' + translations.FETCHING_PROJECTS + '<ion-spinner/></p>';
+      $ionicLoading.show({
+        duration: 30000,
+        delay : 400,
+        maxWidth: 600,
+        noBackdrop: true,
+        template: template
+      });
     });
   }
 
@@ -96,7 +99,9 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
     //console.log("handleSyncTables called args", args);
     switch (args.result.toString()) {
       case "Sync" :
-        updateSyncButtonsText("Syncing...");
+        $translate('SYNCING').then(function (translationText) {
+          updateSyncButtonsText(translationText);
+        });
         SyncButtonsClass("Remove", "ng-hide");
         break;
       case "Complete" :
@@ -104,21 +109,27 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
         break;
       case "100497" :
         SyncButtonsClass("Remove", "ng-hide");
-        updateSyncButtonsText("No device records to sync...");
+        $translate('NO_RECS_TO_SYNC').then(function (translationText) {
+          updateSyncButtonsText(translationText);
+        });
         $timeout( function() {
           SyncButtonsClass("Add", "ng-hide");
         },3000);
         break;
       case "100498" :
         SyncButtonsClass("Remove", "ng-hide");
-        updateSyncButtonsText("Sync already in progress...");
+        $translate('SYNC_IN_PROGRESS').then(function (translationText) {
+          updateSyncButtonsText(translationText);
+        });
         $timeout( function() {
           SyncButtonsClass("Add", "ng-hide");
         },3000);
         break;
       case "100402" :
         SyncButtonsClass("Remove", "ng-hide");
-        updateSyncButtonsText("Please connect before syncing");
+        $translate('PLEASE_CONNECT').then(function (translationText) {
+          updateSyncButtonsText(translationText);
+        });
         $timeout( function() {
           SyncButtonsClass("Add", "ng-hide");
         },3000);
@@ -262,17 +273,26 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   ProjectExpenseCtrl - list of Times or Expenses
 ===========================================================================
 */
-.controller('ProjectExpenseCtrl', ['$scope', '$stateParams', 'ProjectService', function($scope, $stateParams, ProjectService) {
+.controller('ProjectExpenseCtrl', ['$scope', '$stateParams', 'ProjectService', '$translate', function($scope, $stateParams, ProjectService, $translate) {
 
   //console.log('Angular : ProjectExpenseCtrl, projectId ->' + $stateParams.projectId);
   switch ($stateParams.type) {
-      case 'time' : $scope.paramType = "Timesheets";
+      case 'time' :
+        $scope.paramType = "Timesheets";
+        $translate('TIMESHEETS').then(function (translationText) {
+          $scope.title = translationText;
+        });
         break;
-      default :  $scope.paramType = 'Expenses';
+      default :
+        $scope.paramType = 'Expenses';
+        $translate('EXPENSES').then(function (translationText) {
+          $scope.title = translationText;
+        });
     }
 
   ProjectService.expenses($stateParams.type, $stateParams.projectId).then(function(timesheets) {
     $scope.expenses = timesheets;
+    $scope.$apply();
     //console.log('ProjectExpenseCtrl -> ' + angular.toJson($scope.expenses ));
   }, function(reason) {
     console.error('promise returned error, reason -> ' + reason);
@@ -285,14 +305,20 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   ProjectExpNewCtrl - New Time or Expense
 ===========================================================================
 */
-.controller('ProjectExpNewCtrl', ['$scope', '$rootScope', '$stateParams', '$ionicLoading', '$ionicPopup', '$ionicModal', '$location', '$cordovaBarcodeScanner', 'ProjectService', 'Camera', function($scope, $rootScope, $stateParams, $ionicLoading, $ionicPopup, $ionicModal, $location, $cordovaBarcodeScanner, ProjectService, Camera) {
+.controller('ProjectExpNewCtrl', ['$scope', '$rootScope', '$stateParams', '$ionicLoading', '$ionicPopup', '$ionicModal', '$location', '$cordovaBarcodeScanner', 'ProjectService', 'Camera', '$translate', function($scope, $rootScope, $stateParams, $ionicLoading, $ionicPopup, $ionicModal, $location, $cordovaBarcodeScanner, ProjectService, Camera, $translate) {
 
   switch ($stateParams.type) {
       case 'time' :
         $scope.paramType = "Timesheet";
+        $translate('NEW_TIMESHEET').then(function (translationText) {
+          $scope.title = translationText;
+        });
         break;
       default :
         $scope.paramType = 'Expense';
+        $translate('NEW_EXPENSE').then(function (translationText) {
+          $scope.title = translationText;
+        });
     }
   $scope.projectId = $stateParams.projectId;
   $scope.description = "";

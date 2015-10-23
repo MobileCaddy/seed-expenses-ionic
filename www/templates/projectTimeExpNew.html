@@ -1,6 +1,6 @@
 <ion-view hide-back-button="true">
   <ion-nav-title>
-    New {{paramType}}
+    {{title}}
   </ion-nav-title>
   <ion-content padding="true">
     <form name="expenseForm" ng-controller="ProjectExpNewCtrl" ng-submit="submitForm()">
@@ -8,21 +8,21 @@
         <span ng-switch="paramType">
            <span name="timesheetspan" ng-switch-when="Timesheet">
               <label class="item item-input item-stacked-label">
-                <span class="input-label">Description</span>
-                <input name="description" ng-model="description" type="text" placeholder="What did you spend time doing?" required/>
+                <span class="input-label">{{'NEW_REC_DESCRIPTION' | translate}}</span>
+                <input name="description" ng-model="description" type="text" placeholder="{{'TIMESHEET_DESC_PLACEHOLDER' | translate}}" required/>
               </label>
               <label class="item item-input item-stacked-label">
-                <span class="input-label">Duration in minutes</span>
+                <span class="input-label">{{'TIMESHEET_DESC' | translate}}</span>
                   <input name="expenseValue" ng-model="expenseValue"  type="number" required/>
               </label>
            </span>
            <span ng-switch-when="Expense">
               <label class="item item-input item-stacked-label">
-                <span class="input-label">Description</span>
-                <input name="description" ng-model="description"  type="text" placeholder="What did you spend money on?" required/>
+                <span class="input-label">{{'NEW_REC_DESCRIPTION' | translate}}</span>
+                <input name="description" ng-model="description"  type="text" placeholder="{{'EXPENSE_DESC_PLACEHOLDER' | translate}}" required/>
               </label>
               <label class="item item-input item-stacked-label">
-                <span class="input-label">How much was it?</span>
+                <span class="input-label">{{'TIMESHEET_DESC' | translate}}</span>
                   <input name="expenseValue" ng-model="expenseValue"  type="number" required/>
               </label>
            </span>
@@ -32,28 +32,28 @@
         <div class="col">
           <button
             ng-disabled="expenseForm.$invalid"
-            class="button-full button icon-left ion-checkmark button-positive submit-expense">Submit</button>
+            class="button-full button button-positive submit-expense">{{'SUBMIT' | translate}}</button>
         </div>
         <div class="col">
-          <a class="button-full button icon-left ion-close button-assertive" href="#/app/project/{{projectId}}">Cancel</a>
+          <a class="button-full button icon-right ion-close button-assertive" href="#/app/project/{{projectId}}">{{'CANCEL' | translate}}</a>
         </div>
       </div>
     </form>
-      <div class="row" ng-show="paramType=='Expense'">
-        <div class="col">
-          <button class="button-full button button-positive" ng-click="scanBarcode()">Scan Barcode</button>
-        </div>
-        <div class="col">
-          <button class="button-full button button-positive" ng-click="capturePhoto()">Take Picture</button>
-        </div>
-      </div>
-      <div class="row" ng-show="paramType=='Expense'">
-        <div class="col" ng-show="scanImageData">
-          <h4>{{scanImageData}}</h4>
-        </div>
-        <div class="col" ng-show="photoImageData">
-          <img data-ng-src="data:image/jpg;base64,{{photoImageData}}" />
-        </div>
-      </div>
+<!--       <div class="row" ng-show="paramType=='Expense'">
+  <div class="col">
+    <button class="button-full button button-positive" ng-click="scanBarcode()">Scan Barcode</button>
+  </div>
+  <div class="col">
+    <button class="button-full button button-positive" ng-click="capturePhoto()">Take Picture</button>
+  </div>
+</div>
+<div class="row" ng-show="paramType=='Expense'">
+  <div class="col" ng-show="scanImageData">
+    <h4>{{scanImageData}}</h4>
+  </div>
+  <div class="col" ng-show="photoImageData">
+    <img data-ng-src="data:image/jpg;base64,{{photoImageData}}" />
+  </div>
+</div> -->
   </ion-content>
 </ion-view>

@@ -3,10 +3,11 @@
 
 // Ionic overrides
 
-$positive:							#2aa3fe;
-$item-divider-bg:				#caecd3;
-$list-header-color:			#caecd3;
-$button-light-border:		#7fd291;
+$positive:							#16325c;
+$energized:             #004776;
+$item-divider-bg:       lighten($positive, 50%);
+$list-header-color:     lighten($positive, 50%);
+$button-light-border:   lighten($positive, 50%);
 
 @import "ionic/ionic";
 
@@ -65,9 +66,6 @@ a.disabled {
 }
 
 .search-clear-button {
-  position: absolute;
-  right: 0;
-  top: 0px;
   color: #bbb;
 }
 
@@ -76,4 +74,25 @@ a.disabled {
   position: fixed;
   bottom: 0px;
   z-index: 9999;
+}
+
+.rtl {
+  direction: rtl;
+}
+
+.item-complex .item-content, .item-radio .item-content {
+  padding: 16px 16px 16px 49px;
+}
+
+.item-input input {
+  padding-right: 0;
+  padding-left: 24px;
+}
+
+.item-input {
+  padding: 6px 16px 5px 0;
+}
+
+.loading-container {
+  direction: rtl;
 }

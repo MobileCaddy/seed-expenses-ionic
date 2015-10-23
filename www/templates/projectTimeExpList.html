@@ -1,13 +1,16 @@
- <ion-view title="{{paramType}}">
+ <ion-view>
+  <ion-nav-title>
+   {{title}}
+  </ion-nav-title>
   <ion-content>
-    <ion-item ng-show="expenses.length==0">No records.</ion-item>
+    <ion-item ng-show="expenses.length==0">{{'NO_RECORDS' | translate}}</ion-item>
     <ion-list>
       <div class="list list-inset">
         <ion-item ng-repeat="record in expenses" type="item-text-wrap">
           <h3>{{record.mobilecaddy1__Short_Description__c}}</h3>
           <p>
            <span ng-switch="paramType">
-             <span name="timesheetspan" ng-switch-when="Timesheets">{{record.mobilecaddy1__Duration_Minutes__c}} minutes</span>
+             <span name="timesheetspan" ng-switch-when="Timesheets">{{record.mobilecaddy1__Duration_Minutes__c}} {{'MINUTES' | translate}}</span>
              <span ng-switch-when="Expenses">£{{record.mobilecaddy1__Expense_Amount__c}}</span>
            </span>
            </br>ID: {{record.Name}}

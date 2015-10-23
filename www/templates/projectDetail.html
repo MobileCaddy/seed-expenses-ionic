@@ -16,7 +16,7 @@
 
         <div class="col">
                 <div class="item item-divider">
-                <h4>Location</h4>
+                <h4>{{'LOCATION' | translate}}</h4>
                 </div>
                 <div class="item item-text-wrap">
                 <p>{{ project.location }}</p>
@@ -25,19 +25,19 @@
 
         <div class="col">
                 <div class="item item-divider">
-                <h4>Time</h4>
+                <h4>{{'TIME' | translate}}</h4>
                 </div>
                 <div class="item item-text-wrap">
-                <p>{{hours}}h {{minutes}}m</p>
+                <p>{{hours}}{{'HOURS_ABBREV' | translate}} {{minutes}}{{'MINUTES_ABBREV' | translate}}</p>
                 </div>
         </div>
 
         <div class="col">
                 <div class="item item-divider">
-                <h4>Expense</h4>
+                <h4>{{'EXPENSE' | translate}}</h4>
                 </div>
                 <div class="item item-text-wrap">
-                <p>£{{totalExpense}}</p>
+                <p>{{'CURRENCY_SYMBOL' | translate}}{{totalExpense}}</p>
                 </div>
         </div>
 
@@ -48,8 +48,8 @@
             <button
                 ngClick="Submit"
                 ng-disabled="project.mobilecaddy1__Description__c == project.formDescription"
-                class="button button-block button-positive icon-left ion-checkmark">
-            Save
+                class="button button-block button-positive">
+            {{'SAVE' | translate}}
             </button>
         </div>
     </div>
@@ -57,12 +57,12 @@
     <div class="row">
         <div class="col">
             <a class="button button-block button-positive" href="#app/project/time/new/{{project.Id}}">
-            New Time
+            {{'NEW_TIMESHEET' | translate}}
             </a>
         </div>
         <div class="col">
             <a class="button button-block button-positive" href="#app/project/expense/new/{{project.Id}}">
-            New Expense
+            {{'NEW_EXPENSE' | translate}}
             </a>
         </div>
     </div>
@@ -70,14 +70,14 @@
 
     <div class="list card view-expenses">
 
-          <a href="#app/project/time/{{project.Id}}" class="item item-icon-left">
+          <a href="#app/project/time/{{project.Id}}" class="item item-icon-right">
             <i class="icon ion-clock"></i>
-            View Time Records
+            {{'VIEW_TIMESHEETS' | translate}}
           </a>
 
-          <a href="#app/project/expense/{{project.Id}}" class="item item-icon-left">
+          <a href="#app/project/expense/{{project.Id}}" class="item item-icon-right">
             <i class="icon ion-card"></i>
-            View Expense Records
+            {{'VIEW_EXPENSES' | translate}}
           </a>
 
     </div>
