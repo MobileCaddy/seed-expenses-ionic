@@ -256,14 +256,7 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
   function getProjectsFromSmartStore() {
     return new Promise(function(resolve, reject) {
       devUtils.readRecords('MC_Project__ap', []).then(function(resObject) {
-        // var records = _.sortBy(resObject.records, 'Name');
-        var records = _.chain(resObject.records)
-          .filter(function(el){
-              return el.Id == "a0G24000004RtTrEAK" ? true : false;
-            })
-          .sortBy('Name')
-          .value();
-
+        var records = _.sortBy(resObject.records, 'Name');
         $rootScope.$broadcast('scroll.refreshComplete');
         resolve(records);
       }).catch(function(resObject){

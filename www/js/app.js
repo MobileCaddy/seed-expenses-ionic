@@ -204,13 +204,22 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', '
     'CURRENCY_SYMBOL': '£',
     'HOURS_ABBREV': 'h',
     'MINUTES_ABBREV': 'm',
+    'MINUTES': 'minutes',
     'CANCEL': 'Cancel',
     'SUBMIT': 'Submit',
     'NEW_REC_DESCRIPTION': 'Description',
     'TIMESHEET_DESC': 'Duration in minutes',
     'TIMESHEET_DESC_PLACEHOLDER': 'What did you spend time doing?',
     'EXPENSE_DESC': 'How much was it?',
-    'EXPENSE_DESC_PLACEHOLDER': 'What did you spend money on?'
+    'EXPENSE_DESC_PLACEHOLDER': 'What did you spend money on?',
+    'MENU_TITLE': 'Menu',
+    'BACK': 'Back',
+    'SEARCH': 'Search',
+    'SAVING': 'Saving...',
+    'SAVING_PROJECT': 'Saving project...',
+    'SAVING_RECORD': 'Saving record...',
+    'SYNC_REQUIRED': 'Sync Required',
+    'PULL_TO_REFRESH': 'Pull to refresh'
   });
   $translateProvider.translations('he', {
     'TITLE_PROJECTS': 'פרויקטים',
@@ -233,16 +242,25 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', '
     'SAVE': 'שמור',
     'VIEW_TIMESHEETS': 'רשומות גליון צפה',
     'VIEW_EXPENSES': 'רשומות תצוגת הוצאות',
-    'CURRENCY_SYMBOL': '£',
+    'CURRENCY_SYMBOL': '₪',
     'HOURS_ABBREV': 'שעות',
     'MINUTES_ABBREV': 'דקות',
+    'MINUTES': 'דקות',
     'CANCEL': 'לבטל',
     'SUBMIT': 'שלח',
     'NEW_REC_DESCRIPTION': 'תיאור',
     'TIMESHEET_DESC': 'משך בדקות',
     'TIMESHEET_DESC_PLACEHOLDER': 'מה אתה מבזבז את הזמן עושה?',
     'EXPENSE_DESC': 'כמה זה היה?',
-    'EXPENSE_DESC_PLACEHOLDER': 'מה עשה לך להוציא כסף על?'
+    'EXPENSE_DESC_PLACEHOLDER': 'מה עשה לך להוציא כסף על?',
+    'MENU_TITLE': 'תפריט',
+    'BACK': 'חזור',
+    'SEARCH': 'חיפוש',
+    'SAVING': 'שמירה ...',
+    'SAVING_PROJECT': 'שמירת פרויקט ...',
+    'SAVING_RECORD': 'חיסכון שיא ...',
+    'SYNC_REQUIRED': 'סנכרון הנדרש',
+    'PULL_TO_REFRESH': 'משוך לרענן'
   });
 
   $translateProvider.preferredLanguage('he');

@@ -1,9 +1,9 @@
 <ion-view cache-view="false" title="Mobile Table Inspector">
 	<ion-content>
    	<ion-list>
-		  <ion-item class="item item-button-right" ng-click="showTable(table.Name);" ng-repeat="table in tables">
+		  <ion-item class="item item-button-left" ng-click="showTable(table.Name);" ng-repeat="table in tables">
 		  	<span>{{table.Name}}</span>
-		    <button ng-click="syncTable(table.Name); $event.stopPropagation();" class="button button-positive" ng-show="(table.Name.indexOf('__ap') >= 0 || table.Name.indexOf('__mc') >= 0) && table.Name.indexOf('SnapShot') < 0" style="right:160px !important;">
+		    <button ng-click="syncTable(table.Name); $event.stopPropagation();" class="button button-positive" ng-show="(table.Name.indexOf('__ap') >= 0 || table.Name.indexOf('__mc') >= 0) && table.Name.indexOf('SnapShot') < 0" style="left:160px !important;">
 		    	Sync
 		    </button>
 		    <button ng-click="saveTableToML(table.Name); $event.stopPropagation();" class="button button-energized" ng-show="table.Name.indexOf('SnapShot') < 0 && table.Name.indexOf('syncLib') < 0">

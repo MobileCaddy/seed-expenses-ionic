@@ -17,7 +17,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'pascalprecht.trans
   angular.element(e).removeClass( "mc-hide" );
 
   // Set height of list scrollable area
-  var winHeight = window.innerHeight - 125;
+  var winHeight = window.innerHeight - 180; // allow for tab bar and search box
   var projectsList = document.getElementById('project-list');
   projectsList.setAttribute("style","height:" + winHeight + "px");
 
@@ -181,8 +181,10 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'pascalprecht.trans
       if (tables && tables.length !== 0) {
         // Is the 'Refresh and Sync' enabled?
         if (!angular.element(storesSyncButton).hasClass("disabled")) {
-          updateSyncButtonsText("Sync Required");
-          SyncButtonsClass("Remove", "disabled");
+          $translate('SYNC_REQUIRED').then(function (translationText) {
+            updateSyncButtonsText(translationText);
+            SyncButtonsClass("Remove", "disabled");
+          });
         }
       }
     });
@@ -195,7 +197,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'pascalprecht.trans
   ProjectDetailCtrl
 ===========================================================================
 */
-.controller('ProjectDetailCtrl', ['$scope', '$rootScope', '$stateParams', '$location', '$ionicLoading', 'ProjectService', function($scope, $rootScope, $stateParams, $location, $ionicLoading,  ProjectService) {
+.controller('ProjectDetailCtrl', ['$scope', '$rootScope', '$stateParams', '$location', '$ionicLoading', 'ProjectService', '$translate', function($scope, $rootScope, $stateParams, $location, $ionicLoading,  ProjectService, $translate) {
 
   // Listen for event broadcast when new Time/Expense created
   var unregisterEvent =  $rootScope.$on('handleRefreshProjectTotals', function(event) {
@@ -238,12 +240,15 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'pascalprecht.trans
    */
   $scope.submitForm = function() {
     //console.log('submitForm');
-    $ionicLoading.show({
-      template: '<h1>Saving...</h1><p>Saving project...</p><i class="icon ion-loading-b" style="font-size: 32px"></i>',
-      animation: 'fade-in',
-      showBackdrop: true,
-      maxWidth: 600,
-      duration: 30000
+    $translate(['SAVING','SAVING_PROJECT']).then(function (translations) {
+      var template = '<h1>' + translations.SAVING + '</h1><p>' + translations.SAVING_PROJECT + '</p><i class="icon ion-loading-b" style="font-size: 32px"></i>';
+      $ionicLoading.show({
+        template: template,
+        animation: 'fade-in',
+        showBackdrop: true,
+        maxWidth: 600,
+        duration: 30000
+      });
     });
     var newProj = {};
     newProj.Id = $scope.project.Id;
@@ -337,12 +342,15 @@ angular.module('starter.controllers', ['ionic', 'ngCordova', 'pascalprecht.trans
         varNewExp.mobilecaddy1__Expense_Amount__c = $scope.expenseForm.expenseValue.$modelValue;
     }
     //console.log('ProjectExpNewCtrl, varNewExp -> ' + angular.toJson(varNewExp));
-    $ionicLoading.show({
-      duration: 30000,
-      delay : 400,
-      maxWidth: 600,
-      noBackdrop: true,
-      template: '<h1>Saving...</h1><p id="app-progress-msg" class="item-icon-left">Saving ' + $stateParams.type + ' record...<ion-spinner/></p>'
+    $translate(['SAVING','SAVING_RECORD']).then(function (translations) {
+      var template = '<h1>' + translations.SAVING + '</h1><p id="app-progress-msg" class="item-icon-left">' + translations.SAVING_RECORD + '<ion-spinner/></p>';
+      $ionicLoading.show({
+        duration: 30000,
+        delay : 400,
+        maxWidth: 600,
+        noBackdrop: true,
+        template: template
+      });
     });
     ProjectService.newExpense(varNewExp,
       function(){
