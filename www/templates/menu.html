@@ -5,7 +5,7 @@
         <i class="icon ion-ios-arrow-forward"></i> {{'BACK' | translate}}
       </ion-nav-back-button>
       <ion-nav-buttons side="right">
-        <button class="button button-icon button-clear ion-navicon" menu-toggle="right" ng-hide="$exposeAside.active">
+        <button class="button button-icon button-clear ion-navicon" menu-toggle="right">
         </button>
       </ion-nav-buttons>
     </ion-nav-bar>
@@ -13,19 +13,45 @@
   </ion-side-menu-content>
 
   <ion-side-menu side="right">
-    <ion-header-bar class="bar-assertive">
-      <h1 class="title">{{'MENU_TITLE' | translate}}</h1>
+    <ion-header-bar class="bar-calm">
     </ion-header-bar>
     <ion-content>
       <ion-list>
-        <ion-item menu-close href="#/app/projects">
-          {{'TITLE_PROJECTS' | translate}}
+        <ion-item menu-close href="#/app/projects" class="mc-side-menu">
+          <span class="slds">
+            <span class="slds-icon__container slds-icon-custom-44">
+              <svg class="slds-icon">
+                <use xlink:href="" ng-href="{{ 'slds_assets/icons/custom-sprite/svg/symbols.svg#custom44' | svgIconCardHref }}"></use>
+              </svg>
+            </span>
+            <span class="slds-p-right--small">
+              {{'TITLE_PROJECTS' | translate}}
+            </span>
+          </span>
         </ion-item>
-        <ion-item menu-close href="#/app/settings">
-          {{'SETTINGS' | translate}}
+        <ion-item menu-close href="#/app/settings" class="mc-side-menu">
+          <span class="slds">
+            <span class="slds-icon__container">
+              <svg class="slds-icon slds-icon--small">
+                <use xlink:href="" ng-href="{{ 'slds_assets/icons/utility-sprite/svg/symbols.svg#settings' | svgIconCardHref }}"></use>
+              </svg>
+            </span>
+            <span class="slds-p-right--medium">
+              {{'SETTINGS' | translate}}
+            </span>
+          </span>
         </ion-item>
-        <ion-item menu-close ng-click="doRefreshAndSync()">
-          {{'REFRESH_AND_SYNC' | translate}}
+        <ion-item menu-close ng-click="doRefreshAndSync()" class="mc-side-menu">
+          <span class="slds">
+            <span class="slds-icon__container">
+              <svg class="slds-icon slds-icon--small">
+                <use xlink:href="" ng-href="{{ 'slds_assets/icons/utility-sprite/svg/symbols.svg#refresh' | svgIconCardHref }}"></use>
+              </svg>
+            </span>
+            <span class="slds-p-right--medium">
+              {{'REFRESH_AND_SYNC' | translate}}
+            </span>
+          </span>
         </ion-item>
       </ion-list>
     </ion-content>

@@ -19,11 +19,13 @@
         <script src="{!URLFOR($Resource.MY_APP_RESOURCE, 'www/js/services.js')}" type="text/javascript"></script>
         <script src="{!URLFOR($Resource.MY_APP_RESOURCE, 'www/js/controllers.js')}" type="text/javascript"></script>
         <script src="{!URLFOR($Resource.MY_APP_RESOURCE, 'www/lib/js/ng-cordova.min.js')}" type="text/javascript"></script>
+        <script src="{!URLFOR($Resource.MY_APP_RESOURCE, 'www/lib/js/angular-translate.min.js')}" type="text/javascript"></script>
 
         <!-- ============== -->
         <!-- Your App's CSS -->
         <!-- ============== -->
         <link rel="stylesheet" href="{!URLFOR($Resource.MY_APP_RESOURCE, 'www/css/app.css')}"/>
+        <link rel="stylesheet" href="{!URLFOR($Resource.MY_APP_RESOURCE, 'www/slds_assets/styles/salesforce-lightning-design-system-scoped.min.css')}"/>
 
         <!-- ===================================== -->
         <!-- MobileCaddy Required Vendor Libraries -->

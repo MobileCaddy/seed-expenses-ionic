@@ -1,6 +1,9 @@
 angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', 'ngCordova'])
 
 .run(['$ionicPlatform', '$rootScope', 'NetworkService', 'AppRunStatusService', 'NotificationService', function($ionicPlatform, $rootScope, NetworkService, AppRunStatusService, NotificationService) {
+
+  $rootScope.resourcePath = window.RESOURCE_ROOT;
+
   $ionicPlatform.ready(function() {
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
@@ -210,7 +213,11 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', '
     'EXPENSE_DESC': 'How much was it?',
     'EXPENSE_DESC_PLACEHOLDER': 'What did you spend money on?',
     'MENU_TITLE': 'Menu',
-    'BACK': 'Back'
+    'BACK': 'Back',
+    'SEARCH': 'Search',
+    'SAVING': 'Saving...',
+    'SAVING_PROJECT': 'Saving project...',
+    'SAVING_RECORD': 'Saving record...'
   });
   $translateProvider.translations('he', {
     'TITLE_PROJECTS': 'פרויקטים',
@@ -245,7 +252,11 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', '
     'EXPENSE_DESC': 'כמה זה היה?',
     'EXPENSE_DESC_PLACEHOLDER': 'מה עשה לך להוציא כסף על?',
     'MENU_TITLE': 'תפריט',
-    'BACK': 'חזור'
+    'BACK': 'חזור',
+    'SEARCH': 'חיפוש',
+    'SAVING': 'שמירה ...',
+    'SAVING_PROJECT': 'שמירת פרויקט ...',
+    'SAVING_RECORD': 'חיסכון שיא ...'
   });
 
   $translateProvider.preferredLanguage('he');

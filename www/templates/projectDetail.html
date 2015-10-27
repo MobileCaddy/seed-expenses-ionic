@@ -1,84 +1,99 @@
-<ion-view cache-view="false"  title="{{project.Name}}">
-  <ion-content padding="true">
+<ion-view cache-view="false" title="{{project.Name}}">
+  <ion-content padding="false">
     <form ng-submit="submitForm()">
-    <div class="card">
-        <div class="item item-divider">
-            <h4>{{ project.Name }}</h4>
 
-        </div>
-        <div class="item item-text-wrap">
-            <textarea ng-model="project.formDescription"></textarea>
-
-        </div>
-    </div>
-
-    <div class="row">
-
-        <div class="col">
-                <div class="item item-divider">
-                <h4>{{'LOCATION' | translate}}</h4>
+      <span class="slds">
+        <div class="slds-card">
+          <div class="slds-card__header slds-grid">
+            <div class="slds-media slds-media--center slds-has-flexi-truncate">
+              <h4>{{ project.Name }}</h4>
+            </div>
+            <div class="slds-no-flex">
+              <button
+                  ngClick="Submit"
+                  ng-disabled="project.mobilecaddy1__Description__c == project.formDescription"
+                  class="slds-button slds-button--brand">
+                {{'SAVE' | translate}}
+              </button>
+            </div>
+          </div> <!-- slds-card__header -->
+          <div class="slds-card__body">
+            <div class="slds-p-left--small slds-p-right--small">
+              <textarea class="slds-textarea" ng-model="project.formDescription"></textarea>
+            </div>
+            <!-- Location / Time / Expense -->
+            <div class="slds-grid">
+              <div class="slds-col--padded">
+                <div class="slds-card__header">
+                  <h4>{{'LOCATION' | translate}}</h4>
                 </div>
-                <div class="item item-text-wrap">
-                <p>{{ project.location }}</p>
+                <div class="slds-card__body">
+                  <p>{{ project.location }}</p>
                 </div>
-        </div>
-
-        <div class="col">
-                <div class="item item-divider">
-                <h4>{{'TIME' | translate}}</h4>
+              </div>
+              <div class="slds-col--padded">
+                <div class="slds-card__header">
+                  <h4>{{'TIME' | translate}}</h4>
                 </div>
-                <div class="item item-text-wrap">
-                <p>{{hours}}{{'HOURS_ABBREV' | translate}} {{minutes}}{{'MINUTES_ABBREV' | translate}}</p>
+                <div class="slds-card__body">
+                  <p>{{hours}}{{'HOURS_ABBREV' | translate}} {{minutes}}{{'MINUTES_ABBREV' | translate}}
                 </div>
-        </div>
-
-        <div class="col">
-                <div class="item item-divider">
-                <h4>{{'EXPENSE' | translate}}</h4>
+              </div>
+              <div class="slds-col--padded">
+                <div class="slds-card__header">
+                  <h4>{{'EXPENSE' | translate}}</h4>
                 </div>
-                <div class="item item-text-wrap">
-                <p>{{'CURRENCY_SYMBOL' | translate}}{{totalExpense}}</p>
+                <div class="slds-card__body">
+                  <p>{{'CURRENCY_SYMBOL' | translate}}{{totalExpense}}</p>
                 </div>
-        </div>
+              </div>
+            </div>
+            <!-- New Timesheet / New Expense -->
+            <div class="slds-grid slds-p-top--medium slds-p-bottom--small slds-grid--align-center">
+              <div class="slds-col--padded">
+                <a class="slds-button slds-button--neutral slds-max-small-button--stretch" href="#app/project/time/new/{{project.Id}}">
+                {{'NEW_TIMESHEET' | translate}}
+                </a>
+              </div>
+              <div class="slds-col--padded">
+                <a class="slds-button slds-button--neutral slds-max-small-button--stretch" href="#app/project/expense/new/{{project.Id}}">
+                {{'NEW_EXPENSE' | translate}}
+                </a>
+              </div>
+            </div>
+          </div> <!-- / slds-card__body -->
+        </div> <!-- / slds-card -->
+      </span>
 
-    </div>
-
-     <div class="row">
-        <div class="col">
-            <button
-                ngClick="Submit"
-                ng-disabled="project.mobilecaddy1__Description__c == project.formDescription"
-                class="button button-block button-positive">
-            {{'SAVE' | translate}}
-            </button>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col">
-            <a class="button button-block button-positive" href="#app/project/time/new/{{project.Id}}">
-            {{'NEW_TIMESHEET' | translate}}
-            </a>
-        </div>
-        <div class="col">
-            <a class="button button-block button-positive" href="#app/project/expense/new/{{project.Id}}">
-            {{'NEW_EXPENSE' | translate}}
-            </a>
-        </div>
-    </div>
     </form>
 
     <div class="list card view-expenses">
 
-          <a href="#app/project/time/{{project.Id}}" class="item item-icon-right">
-            <i class="icon ion-clock"></i>
+      <a href="#app/project/time/{{project.Id}}" class="item">
+        <span class="slds">
+          <span class="slds-icon__container slds-icon-custom-25">
+            <svg class="slds-icon">
+                <use xlink:href="" ng-href="{{ 'slds_assets/icons/custom-sprite/svg/symbols.svg#custom25' | svgIconCardHref }}"></use>
+            </svg>
+          </span>
+          <span class="slds-p-right--small">
             {{'VIEW_TIMESHEETS' | translate}}
-          </a>
+          </span>
+        </span>
+      </a>
 
-          <a href="#app/project/expense/{{project.Id}}" class="item item-icon-right">
-            <i class="icon ion-card"></i>
+      <a href="#app/project/expense/{{project.Id}}" class="item">
+        <span class="slds">
+          <span class="slds-icon__container slds-icon-custom-40">
+            <svg class="slds-icon">
+              <use xlink:href="" ng-href="{{ 'slds_assets/icons/custom-sprite/svg/symbols.svg#custom40' | svgIconCardHref }}"></use>
+            </svg>
+          </span>
+          <span class="slds-p-right--small">
             {{'VIEW_EXPENSES' | translate}}
-          </a>
+          </span>
+        </span>
+      </a>
 
     </div>
 

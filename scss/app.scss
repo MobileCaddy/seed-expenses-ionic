@@ -3,11 +3,21 @@
 
 // Ionic overrides
 
-$positive:							#16325c;
-$energized:             #004776;
-$item-divider-bg:       lighten($positive, 50%);
-$list-header-color:     lighten($positive, 50%);
-$button-light-border:   lighten($positive, 50%);
+
+// use same color as slds $color-brand-dark design token
+$positive:              #0070d2;
+// use same color as slds $color-background-button-brand-active design token
+$calm:                  #00396b;
+// use same color as slds $color-background-inverse design token
+$royal:                  #061c3f;
+
+//$item-divider-bg:       lighten($positive, 50%);
+//$list-header-color:     lighten($positive, 50%);
+
+$font-family-base:                "Salesforce Sans", Arial, sans-serif;
+
+// use same border color as slds $color-border design token
+$item-default-border:             #d8dde6;
 
 @import "ionic/ionic";
 
@@ -95,4 +105,11 @@ a.disabled {
 
 .loading-container {
   direction: rtl;
+}
+
+.mc-side-menu,
+.mc-side-menu > a {
+  background-color: $royal !important;
+  color: #fff !important;
+  border-color: #2a426c !important; // matches sldl $color-border-separator-inverse design token
 }

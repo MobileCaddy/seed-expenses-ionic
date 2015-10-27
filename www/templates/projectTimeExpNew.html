@@ -2,42 +2,55 @@
   <ion-nav-title>
     {{title}}
   </ion-nav-title>
-  <ion-content padding="true">
+  <ion-content padding="true" class="slds">
+
     <form name="expenseForm" ng-controller="ProjectExpNewCtrl" ng-submit="submitForm()">
-      <div class="list">
+
+      <div class="slds-form--stacked">
         <span ng-switch="paramType">
-           <span name="timesheetspan" ng-switch-when="Timesheet">
-              <label class="item item-input item-stacked-label">
-                <span class="input-label">{{'NEW_REC_DESCRIPTION' | translate}}</span>
-                <input name="description" ng-model="description" type="text" placeholder="{{'TIMESHEET_DESC_PLACEHOLDER' | translate}}" required/>
-              </label>
-              <label class="item item-input item-stacked-label">
-                <span class="input-label">{{'TIMESHEET_DESC' | translate}}</span>
-                  <input name="expenseValue" ng-model="expenseValue"  type="number" required/>
-              </label>
-           </span>
-           <span ng-switch-when="Expense">
-              <label class="item item-input item-stacked-label">
-                <span class="input-label">{{'NEW_REC_DESCRIPTION' | translate}}</span>
-                <input name="description" ng-model="description"  type="text" placeholder="{{'EXPENSE_DESC_PLACEHOLDER' | translate}}" required/>
-              </label>
-              <label class="item item-input item-stacked-label">
-                <span class="input-label">{{'TIMESHEET_DESC' | translate}}</span>
-                  <input name="expenseValue" ng-model="expenseValue"  type="number" required/>
-              </label>
-           </span>
+          <span name="timesheetspan" ng-switch-when="Timesheet">
+            <div class="slds-form-element">
+              <label class="slds-form-element__label">{{'NEW_REC_DESCRIPTION' | translate}}</label>
+              <div class="slds-form-element__control">
+                <input name="description" class="slds-input" ng-model="description" type="text" placeholder="{{'TIMESHEET_DESC_PLACEHOLDER' | translate}}" required/>
+              </div>
+            </div>
+            <div class="slds-form-element">
+              <label class="slds-form-element__label">{{'TIMESHEET_DESC' | translate}}</label>
+              <div class="slds-form-element__control">
+                <input name="expenseValue" class="slds-input" ng-model="expenseValue"  type="number" required/>
+              </div>
+            </div>
+          </span>
+          <span ng-switch-when="Expense">
+            <div class="slds-form-element">
+              <label class="slds-form-element__label">{{'NEW_REC_DESCRIPTION' | translate}}</label>
+              <div class="slds-form-element__control">
+                <input name="description" class="slds-input" ng-model="description"  type="text" placeholder="{{'EXPENSE_DESC_PLACEHOLDER' | translate}}" required/>
+              </div>
+            </div>
+            <div class="slds-form-element">
+              <label class="slds-form-element__label">{{'NEW_REC_DESCRIPTION' | translate}}</label>
+              <div class="slds-form-element__control">
+                <input name="expenseValue" class="slds-input" ng-model="expenseValue"  type="number" required/>
+              </div>
+            </div>
+          </span>
         </span>
       </div>
-      <div class="row">
-        <div class="col">
-          <button
-            ng-disabled="expenseForm.$invalid"
-            class="button-full button button-positive submit-expense">{{'SUBMIT' | translate}}</button>
+
+      <span class="slds">
+        <div class="slds-grid slds-p-top--medium slds-grid--align-center">
+          <div class="slds-col--padded">
+            <button
+              ng-disabled="expenseForm.$invalid"
+              class="slds-button slds-button--brand slds-max-small-button--stretch submit-expense">{{'SUBMIT' | translate}}</button>
+          </div>
+          <div class="slds-col--padded">
+            <a class="slds-button slds-button--neutral slds-max-small-button--stretch" href="#/app/project/{{projectId}}">{{'CANCEL' | translate}}</a>
+          </div>
         </div>
-        <div class="col">
-          <a class="button-full button icon-right ion-close button-assertive" href="#/app/project/{{projectId}}">{{'CANCEL' | translate}}</a>
-        </div>
-      </div>
+      </span>
     </form>
 <!--       <div class="row" ng-show="paramType=='Expense'">
   <div class="col">

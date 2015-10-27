@@ -1,9 +1,11 @@
- <ion-view>
+<ion-view>
   <ion-nav-title>
    {{title}}
   </ion-nav-title>
-  <ion-content>
-    <ion-item ng-show="expenses.length==0">{{'NO_RECORDS' | translate}}</ion-item>
+  <ion-content class="slds">
+    <div ng-show="expenses">
+      <div ng-show="expenses.length==0" ng-cloak class="slds-text-body--regular slds-p-right--small">{{'NO_RECORDS' | translate}}</div>
+    </div>
     <ion-list>
       <div class="list list-inset">
         <ion-item ng-repeat="record in expenses" type="item-text-wrap">
@@ -18,6 +20,5 @@
         </ion-item>
       </div>
     </ion-list>
-
   </ion-content>
 </ion-view>

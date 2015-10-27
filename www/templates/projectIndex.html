@@ -1,22 +1,26 @@
  <ion-view title="{{'TITLE_PROJECTS' | translate}}">
   <ion-content>
-    <div class="row center">
-      <div class="col text-right">
-        <div class="item-input search-input">
-          <i class="icon ion-search placeholder-icon"></i>
-          <input type="search" ng-model="search.query" />
+
+    <span class="slds">
+      <div class="slds-grid slds-p-top--small slds-p-bottom--small">
+        <div class="slds-col slds-p-top--x-small slds-p-left--x-small" style="text-align:left;width:0;">
+          <svg class="slds-icon slds-icon--x-small slds-icon-text-default">
+            <use xlink:href="" ng-href="{{ 'slds_assets/icons/utility-sprite/svg/symbols.svg#search' | svgIconCardHref }}"></use>
+          </svg>
+        </div>
+        <div class="slds-col">
+          <input type="search" class="slds-input" ng-model="search.query" placeholder="{{'SEARCH' | translate}}" />
+        </div>
+        <div class="slds-col slds-p-top--x-small slds-p-right--x-small" style="width:0;">
+          <button class="slds-button slds-button--icon-bare" ng-if="search.query.length" ng-click="clearSearch()">
+            <svg class="slds-button__icon">
+              <use xlink:href="" ng-href="{{ 'slds_assets/icons/utility-sprite/svg/symbols.svg#close' | svgIconCardHref }}"></use>
+            </svg>
+          </button>
         </div>
       </div>
-      <div class="col text-left">
-        <button ng-if="search.query.length"
-          class="button button-icon ion-android-close search-clear-button"
-          ng-click="clearSearch()">
-        </button>
-      </div>
-    </div>
-    <ion-refresher on-refresh="doRefreshFromPulldown()"
-                   pulling-text="Pull to refresh">
-    </ion-refresher>
+    </span>
+
     <ion-scroll zooming="false" direction="y" id="project-list">
       <ion-item class="item mti-item"
         collection-repeat="project in projects | filter:search.query" type="item-text-wrap"
