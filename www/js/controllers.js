@@ -69,7 +69,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   angular.element(e).removeClass( "mc-hide" );
 
   // Set height of list scrollable area
-  var winHeight = window.innerHeight;
+  var winHeight = window.innerHeight - 90; // adjust for search box
   var projectsList = document.getElementById('project-list');
   projectsList.setAttribute("style","height:" + winHeight + "px");
 
@@ -108,8 +108,8 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   });
   $rootScope.refreshFlag = false;
 
-  $scope.doRefreshFromPulldown = function() {
-  	//console.log('doRefreshFromPulldown');
+  $scope.doRefreshAfterSync = function() {
+  	//console.log('doRefreshAfterSync');
   	ProjectService.all(true).then(function(projects) {
       $rootScope.projects = projects;
     }, function(reason) {
@@ -132,6 +132,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
         break;
       case "Complete" :
         SyncButtonsClass("Add", "ng-hide");
+        $scope.doRefreshAfterSync();
         break;
       case "100497" :
         SyncButtonsClass("Remove", "ng-hide");
@@ -375,7 +376,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
       $cordovaBarcodeScanner.scan().then(function(imageData) {
         //console.log("Cancelled -> " + imageData.cancelled);
         if (!imageData.cancelled) {
-          $scope.scanImageData = imageData;
+          $scope.scanImageData = imageData.text;
           //console.log("Barcode Format -> " + imageData.format);
         }
       }, function(error) {
@@ -705,7 +706,7 @@ angular.module('starter.controllers', ['ionic', 'ngCordova'])
   });
 
   $scope.showTable = function(tableName) {
-    $location.path(decodeURIComponent("/tab/settings/mti/" + tableName));
+    $location.path(decodeURIComponent("/app/settings/mti/" + tableName));
   };
 
   $scope.syncTable = function(tableName) {
