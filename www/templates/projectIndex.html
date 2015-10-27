@@ -8,9 +8,6 @@
         ng-click="clearSearch()">
       </button>
     </div>
-    <ion-refresher on-refresh="doRefreshFromPulldown()"
-                   pulling-text="Pull to refresh">
-    </ion-refresher>
     <ion-scroll zooming="false" direction="y" id="project-list">
       <ion-item class="item mti-item"
         collection-repeat="project in projects | filter:search.query" type="item-text-wrap"
