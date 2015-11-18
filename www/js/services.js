@@ -138,11 +138,25 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
 
 .factory('SyncService', ['$rootScope', 'devUtils', 'NotificationService', function($rootScope, devUtils, NotificationService){
 
+  function initialSync(tablesToSync) {
+    setSyncState("Syncing");
+
+    devUtils.initialSync(tablesToSync).then(function(res){
+      $rootScope.$broadcast('syncTables', {result : "Complete"});
+      setSyncState("Complete");
+    });
+  }
+
   function  syncTables(tablesToSync, syncWithoutLocalUpdates, maxTableAge) {
+    // Check to make sure we don't already have a sync in progress.
+    // MobileCaddy Utils will also check for this condition, but we'll check before calling utils
+    if (getSyncState() == "Syncing") {
+      return;
+    }
+    setSyncState("Syncing");
     if (typeof(maxTableAge) == "undefined") {
       maxTableAge = (1000 * 60 * 3); // 3 minutes
     }
-    //console.log('syncTables syncWithoutLocalUpdates, maxTableAge',syncWithoutLocalUpdates,maxTableAge);
     $rootScope.$broadcast('syncTables', {result : "Sync"});
 
     var stopSyncing = false;
@@ -177,6 +191,7 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
               if (firstSync) {
                 stopSyncing = true;
                 $rootScope.$broadcast('syncTables', {result : resObject.status});
+                setSyncState("Complete");
               }
             }
             // Unable to sync -> set a localnotification
@@ -188,6 +203,7 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
         if (syncCount == tablesToSync.length && !stopSyncing) {
           // All syncs complete
           $rootScope.$broadcast('syncTables', {result : "Complete"});
+          setSyncState("Complete");
         }
         firstSync = false;
       }).catch(function(res){
@@ -202,8 +218,22 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
           $rootScope.$broadcast('syncTables', {result : "Error"});
         }
         NotificationService.setLocalNotification();
+        setSyncState("Complete");
       });
     });
+  }
+
+  function getSyncState() {
+    var syncState = localStorage.getItem("syncState");
+    if (syncState === null) {
+      syncState = "Complete";
+      localStorage.setItem("syncState", syncState);
+    }
+    return syncState;
+  }
+
+  function setSyncState(status) {
+    localStorage.setItem("syncState", status);
   }
 
   return {
@@ -213,28 +243,22 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
         syncLock = "false";
         localStorage.setItem(syncLockName, syncLock);
       }
-      //console.log("mc getSyncLock syncLock", syncLock);
       return syncLock;
     },
     setSyncLock: function(syncLockName, status){
       localStorage.setItem(syncLockName, status);
-      //console.log("mc setSyncLock", syncLockName, status);
     },
     getSyncState: function(){
-      var syncState = localStorage.getItem("syncState");
-      if (syncState === null) {
-        syncState = "Complete";
-        localStorage.setItem("syncState", syncState);
-      }
-      //console.log("mc getSyncState syncState", syncState);
-      return syncState;
+      return getSyncState();
     },
     setSyncState: function(status){
-      localStorage.setItem("syncState", status);
-      //console.log("mc setSyncState", "syncState", status);
+      setSyncState(status);
     },
     syncTables: function(tabs2Sync, syncWithoutLocalUpdates, maxTableAge) {
       syncTables(tabs2Sync, syncWithoutLocalUpdates, maxTableAge);
+    },
+    initialSync: function(tablesToSync){
+      initialSync(tablesToSync);
     }
   };
 }])
@@ -245,7 +269,7 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
   ===========================================================================
   */
 
-.factory('ProjectService', ['$rootScope', '$q', '_', 'devUtils', 'SyncService', 'NotificationService', function($rootScope, $q, _, devUtils, SyncService, NotificationService) {
+.factory('ProjectService', ['$rootScope', '$q', '_', 'devUtils', 'SyncService', 'NotificationService', 'UserService', function($rootScope, $q, _, devUtils, SyncService, NotificationService, UserService) {
 
   var recTypeIdTime = "012R00000009BycIAE";
   var recTypeIdExp  = "012R00000009ByhIAE";
@@ -298,7 +322,21 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
                 // Unable to sync -> set a localnotification
                 NotificationService.setLocalNotification();
               } else {
-                SyncService.syncTables(['MC_Project_Location__ap', 'MC_Time_Expense__ap'], true);
+                // Example of calling either the devUtils.syncMobileTable (synchronous) devUtils.initialSync (asynchronous).
+                // In this case we're only syncing two tables - as we've already synced the projects above.
+                // However, given the right use case, it could be moved to the app.js and used to sync all tables
+                UserService.hasDoneProcess("initialDataLoaded").then(function(result) {
+                  if (result) {
+                    // If we've already installed the app, and done an initial load of data, then sync tables using standard synchronous call
+                    SyncService.syncTables(['MC_Project_Location__ap', 'MC_Time_Expense__ap'], true);
+                  } else {
+                    // Initial install and load of data => we can do a faster asynchronous load of tables.
+                    // Calls devUtils.initialSync (from within SyncService) rather than usual devUtils.syncMobileTable call
+                    SyncService.initialSync(['MC_Project_Location__ap', 'MC_Time_Expense__ap']);
+                    // Save the fact that we've run the initial data load for the app install
+                    UserService.setProcessDone("initialDataLoaded");
+                  }
+                });
               }
           }, function(reason) {
             console.error("Angular: promise returned reason -> " + reason);
@@ -659,6 +697,75 @@ angular.module('starter.services', ['ngCordova', 'underscore', 'devUtils', 'vsnU
         destinationType : navigator.camera.DestinationType.DATA_URL
       });
       return q.promise;
+    }
+  };
+}])
+
+/*
+===========================================================================
+  U S E R   S E R V I C E
+===========================================================================
+*/
+
+.factory('UserService', ['devUtils', 'logger', function(devUtils, logger) {
+  return {
+    getCurrentUserId: function(){
+      return new Promise(function(resolve, reject) {
+        var currentUserId = localStorage.getItem('currentUserId');
+        if (currentUserId !== null) {
+          resolve(currentUserId);
+        } else {
+          devUtils.getCurrentUserId().then(function(userId){
+            localStorage.setItem('currentUserId', userId);
+            resolve(userId);
+          });
+        }
+      }).catch(function(resObject){
+        logger.error('getCurrentUserId ' + JSON.stringify(resObject));
+        reject(resObject);
+      });
+    },
+    setCurrentUserId: function(userId){
+      return new Promise(function(resolve, reject) {
+        localStorage.setItem('currentUserId', userId);
+        resolve(true);
+      }).catch(function(resObject){
+        logger.error('setCurrentUserId ' + JSON.stringify(resObject));
+        reject(resObject);
+      });
+    },
+    hasDoneProcess: function(processName){
+      return new Promise(function(resolve, reject) {
+        var processes = JSON.parse(localStorage.getItem('processes'));
+        if (processes === null) {
+          resolve(false);
+        } else {
+          if (processes[processName] == "true") {
+            resolve(true);
+          } else {
+            resolve(false);
+          }
+        }
+      }).catch(function(resObject){
+        logger.error('hasDoneProcess ' + JSON.stringify(resObject));
+        reject(resObject);
+      });
+    },
+    setProcessDone: function(processName){
+      return new Promise(function(resolve, reject) {
+        var processes = localStorage.getItem('processes');
+        if (processes === null) {
+          processes = {};
+          processes[processName] = "true";
+          localStorage.setItem('processes', JSON.stringify(processes));
+          resolve(true);
+        } else {
+          resolve(true);
+        }
+      }).catch(function(resObject){
+        logger.error('setProcessDone ' + JSON.stringify(resObject));
+        reject(resObject);
+      });
     }
   };
 }])
