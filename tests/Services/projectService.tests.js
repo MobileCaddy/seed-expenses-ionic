@@ -1,30 +1,4 @@
 
-// N E T W O R K    S E R V I C E
-
-describe('NetworkService Unit Tests', function(){
-  beforeEach(module('starter.services'));
-
-  beforeEach(inject(function (_$rootScope_, _NetworkService_) {
-    NetworkService = _NetworkService_;
-    $rootScope = _$rootScope_;
-
-    localStorage.removeItem('networkStatus');
-  }));
-
-  it('should set localStorage["networkStatus"] to offline', function(){
-    NetworkService.networkEvent('offline');
-    expect(localStorage['networkStatus']).toBe("offline");
-  });
-
-
-  it('should set localStorage["networkStatus"] to online and not sync', function(){
-    localStorage.setItem('networkStatus', 'online');
-    NetworkService.networkEvent('online');
-    expect(localStorage['networkStatus']).toBe("online");
-  });
-
-});
-
 // P R O J E C T    S E R V I C E
 describe('ProjectService Unit Tests', function(){
 
@@ -79,7 +53,7 @@ describe('ProjectService Unit Tests', function(){
         "mobilecaddy1__Short_Description__c" : "Expense 2",
         "Name" : "TAE-005688"
       }
-    ]
+    ];
 
   beforeEach(module('starter.services'));
 

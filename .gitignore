@@ -13,8 +13,11 @@ www/js/*.log
 .sass-cache
 
 # ignore app.css as this is created by the sass
-www/css/app.css
-www/css/app.css.map
+www/css/app.*
+
+# ignore automagically created files
+www/index.html
+www/js/services.js
 
 # Mock and bower stuff
 www/lib/js/ionic.bundle.min.js

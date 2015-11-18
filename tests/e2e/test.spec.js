@@ -82,9 +82,9 @@ describe("Projects", function() {
     element.all(by.css('.button-block')).get(1).click();
     browser.sleep(500);
     var subBtn =  element(by.css('.submit-expense'));
-    expect(subBtn.getAttribute('disabled')).toBe('true')
+    expect(subBtn.getAttribute('disabled')).toBe('true');
     element(by.model('description')).sendKeys('test expense');
-    expect(subBtn.getAttribute('disabled')).toBe('true')
+    expect(subBtn.getAttribute('disabled')).toBe('true');
     element(by.model('expenseValue')).sendKeys('123');
     expect(subBtn.getAttribute('disabled')).toBe(null);
     subBtn.click();
