@@ -11,9 +11,9 @@
     .module('starter.services')
     .factory('SyncService', SyncService);
 
-  SyncService.$inject = ['$rootScope', 'devUtils'];
+  SyncService.$inject = ['$rootScope', 'devUtils','NotificationService'];
 
-  function SyncService($rootScope, devUtils) {
+  function SyncService($rootScope, devUtils, NotificationService) {
 
 
 	  return {
@@ -100,10 +100,10 @@
 	              }
 	            }
 	            // Unable to sync -> set a localnotification
-	            NotificationService.setLocalNotification();
+	            //NotificationService.setLocalNotification();
 	          }
 	        } else {
-	          NotificationService.cancelNotifications();
+	          //NotificationService.cancelNotifications();
 	        }
 	        if (syncCount == tablesToSync.length && !stopSyncing) {
 	          // All syncs complete
@@ -122,7 +122,7 @@
 	          console.error(res);
 	          $rootScope.$broadcast('syncTables', {result : "Error"});
 	        }
-	        NotificationService.setLocalNotification();
+	        //NotificationService.setLocalNotification();
 	        setSyncState("Complete");
 	      });
 	    });

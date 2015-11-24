@@ -5,7 +5,6 @@
 *.zip
 
 node_modules
-bower_components
 tmp
 codeflow
 dest
@@ -18,6 +17,7 @@ www/css/app.*
 # ignore automagically created files
 www/index.html
 www/js/services.js
+www/js/controllers.js
 
 # Mock and bower stuff
 www/lib/js/ionic.bundle.min.js

@@ -10,9 +10,9 @@
     .module('starter.services')
     .factory('NotificationService', NotificationService);
 
-  NotificationService.$inject = ['SyncService', 'logger'];
+  NotificationService.$inject = ['logger'];
 
-  function NotificationService(SyncService, logger) {
+  function NotificationService(logger) {
 
 	  return {
 

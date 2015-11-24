@@ -663,9 +663,9 @@ angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smart
     .module('starter.services')
     .factory('NotificationService', NotificationService);
 
-  NotificationService.$inject = ['SyncService', 'logger'];
+  NotificationService.$inject = ['logger'];
 
-  function NotificationService(SyncService, logger) {
+  function NotificationService(logger) {
 
 	  return {
 
@@ -1083,9 +1083,9 @@ angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smart
     .module('starter.services')
     .factory('SyncService', SyncService);
 
-  SyncService.$inject = ['$rootScope', 'devUtils'];
+  SyncService.$inject = ['$rootScope', 'devUtils','NotificationService'];
 
-  function SyncService($rootScope, devUtils) {
+  function SyncService($rootScope, devUtils, NotificationService) {
 
 
 	  return {
@@ -1172,10 +1172,10 @@ angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smart
 	              }
 	            }
 	            // Unable to sync -> set a localnotification
-	            NotificationService.setLocalNotification();
+	            //NotificationService.setLocalNotification();
 	          }
 	        } else {
-	          NotificationService.cancelNotifications();
+	          //NotificationService.cancelNotifications();
 	        }
 	        if (syncCount == tablesToSync.length && !stopSyncing) {
 	          // All syncs complete
@@ -1194,7 +1194,7 @@ angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smart
 	          console.error(res);
 	          $rootScope.$broadcast('syncTables', {result : "Error"});
 	        }
-	        NotificationService.setLocalNotification();
+	        //NotificationService.setLocalNotification();
 	        setSyncState("Complete");
 	      });
 	    });

@@ -103,8 +103,7 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', '
       url: '/project/:type/new/:projectId',
       views: {
         'projects-tab': {
-          templateUrl: RESOURCE_ROOT +  'templates/projectTimeExpNew.html',
-          controller: 'ProjectExpNewCtrl'
+          templateUrl: RESOURCE_ROOT +  'templates/projectTimeExpNew.html'
         }
       }
     })
