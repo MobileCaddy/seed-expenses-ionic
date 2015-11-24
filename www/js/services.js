@@ -814,7 +814,6 @@ angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smart
 
 	  var projects = [];
 	  var project = null;
-	  var locations = [];
 
 	  return {
 	    all: getProjects,
@@ -827,8 +826,13 @@ angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smart
 	      if (typeof(project) != "undefined") {
 	        project = ProjectArr[0];
 	        if(typeof ProjectArr[0].mobilecaddy1__MC_Project_Location__c != 'undefined') {
-	          if (locations.length <= 0) {
-	            locations =  getLocations(ProjectArr[0].mobilecaddy1__MC_Project_Location__c);
+	          if (!$rootScope.locations || $rootScope.locations.length <= 0) {
+	            getLocations(ProjectArr[0].mobilecaddy1__MC_Project_Location__c).then(function(locations){
+	            	$rootScope.locations = locations;
+	            	ProjectArr[0].location =  getLocationFromId(ProjectArr[0].mobilecaddy1__MC_Project_Location__c);
+	            }).catch(function(e){
+	            	console.error(e);
+	            });
 	          }
 	          ProjectArr[0].location =  getLocationFromId(ProjectArr[0].mobilecaddy1__MC_Project_Location__c);
 	        } else {
@@ -855,14 +859,11 @@ angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smart
 	    expenses: getTimeExpense,
 
 	    newExpense: function(varNewExp, success, error) {
-	      //console.log('Angular: newExpense -> ' + angular.toJson(varNewExp));
 	      devUtils.insertRecord('MC_Time_Expense__ap',varNewExp).then(function(res) {
-	        //console.log('Angular: newExpense,  res -> ' + angular.toJson(res));
 	        success(res);
 	        // perform background sync
 	        SyncService.syncTables(['MC_Time_Expense__ap'], true);
 	      }).catch(function(e) {
-	        //console.log('Angular: newExpense,  error=' + e);
 	        error(e);
 	      });
 	    },
@@ -965,7 +966,7 @@ angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smart
 
 	  function getLocationFromId(locationId) {
 	    //console.log('Angular: locationId->' + locationId);
-	    var location =  _.where(locations, {'Id': locationId});
+	    var location =  _.where($rootScope.locations, {'Id': locationId});
 	    if (typeof location[0]!= 'undefined') {
 	      //console.log('Angular: location->' + location[0].Name);
 	      return location[0].Name;
@@ -976,25 +977,25 @@ angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smart
 	  }
 
 	  function getLocations(locationId) {
-	    //console.log('Angular: getLocations');
-	    devUtils.readRecords('MC_Project_Location__ap', []).then(function(resObject) {
-	      records = resObject.records;
-	      $j.each(records, function(i,record) {
-	        locations.push(record);
-	      });
-	      //console.log('Angular: ' + angular.toJson(locations));
-	      if (locationId != "dummy") {
-	        $rootScope.$apply(function(){
-	          project.location = getLocationFromId(locationId);
-	          this.project = project;
-	        });
-	      }
-	      return locations;
-	    }).catch(function(resObject){
-	      console.error('Angular : Error from readRecords MC_Project_Location__ap -> ' + angular.toJson(resObject));
-	      deferred.reject('error');
-	    });
-	    return locations;
+	    return new Promise(function(resolve, reject) {
+		    //console.log('Angular: getLocations');
+		    devUtils.readRecords('MC_Project_Location__ap', []).then(function(resObject) {
+		      // $j.each(resObject.records, function(i,record) {
+		      //   $rootScope.locations.push(record);
+		      // });
+		      //console.log('Angular: ' + angular.toJson(locations));
+		      // if (locationId != "dummy") {
+		      //   $rootScope.$apply(function(){
+		      //     project.location = getLocationFromId(locationId);
+		      //     this.project = project;
+		      //   });
+		      // }
+		      resolve(resObject.records);
+		    }).catch(function(resObject){
+		      console.error('Angular : Error from readRecords MC_Project_Location__ap -> ', resObject);
+	      	reject('error', resObject);
+		    });
+	  	});
 	  }
 
 
@@ -1009,8 +1010,7 @@ angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smart
 	      //console.log('Angular: getTimeExpense');
 	      var timeExpense = [];
 	      devUtils.readRecords('MC_Time_Expense__ap', []).then(function(resObject) {
-	        records = resObject.records;
-	        $j.each(records, function(i,record) {
+	        resObject.records.forEach(function(record) {
 	          timeExpense.push(record);
 	        });
 	        //console.log('Angular: timeExpense' + angular.toJson(timeExpense));
@@ -1104,23 +1104,24 @@ angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smart
 	      //console.log("mc setSyncLock", syncLockName, status);
 	    },
 
-	    getSyncState: function(){
-	      var syncState = localStorage.getItem("syncState");
-	      if (syncState === null) {
-	        syncState = "Complete";
-	        localStorage.setItem("syncState", syncState);
-	      }
-	      //console.log("mc getSyncState syncState", syncState);
-	      return syncState;
-	    },
+	    getSyncState: getSyncState,
 
-	    setSyncState: function(status){
-	      localStorage.setItem("syncState", status);
-	      //console.log("mc setSyncState", "syncState", status);
-	    },
+	    setSyncState: setSyncState,
+
+	    initialSync: initialSync,
 
 	    syncTables: syncTables
 	  };
+
+
+	  function initialSync(tablesToSync) {
+	    setSyncState("Syncing");
+
+	    devUtils.initialSync(tablesToSync).then(function(res){
+	      $rootScope.$broadcast('syncTables', {result : "Complete"});
+	      setSyncState("Complete");
+	    });
+	  }
 
 
 	  function  syncTables(tablesToSync, syncWithoutLocalUpdates, maxTableAge) {
@@ -1198,6 +1199,19 @@ angular.module('starter.services', ['underscore', 'devUtils', 'vsnUtils', 'smart
 	      });
 	    });
 	  }
+
+	  function getSyncState(){
+      var syncState = localStorage.getItem("syncState");
+      if (syncState === null) {
+        syncState = "Complete";
+        localStorage.setItem("syncState", syncState);
+      }
+      return syncState;
+    }
+
+ 		function setSyncState(status){
+      localStorage.setItem("syncState", status);
+    }
 
   }
 

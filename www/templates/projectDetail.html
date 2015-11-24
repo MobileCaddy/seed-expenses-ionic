@@ -56,12 +56,12 @@
 
     <div class="row">
         <div class="col">
-            <a class="button button-block button-positive" href="#tab/project/time/new/{{project.Id}}">
+            <a class="button button-block button-positive" id="new-time"  href="#tab/project/time/new/{{project.Id}}">
             New Time
             </a>
         </div>
         <div class="col">
-            <a class="button button-block button-positive" href="#tab/project/expense/new/{{project.Id}}">
+            <a class="button button-block button-positive" id="new-exp" href="#tab/project/expense/new/{{project.Id}}">
             New Expense
             </a>
         </div>
@@ -70,12 +70,12 @@
 
     <div class="list card view-expenses">
 
-          <a href="#tab/project/time/{{project.Id}}" class="item item-icon-left">
+          <a href="#tab/project/time/{{project.Id}}" class="item item-icon-left" id="view-time-recs">
             <i class="icon ion-clock"></i>
             View Time Records
           </a>
 
-          <a href="#tab/project/expense/{{project.Id}}" class="item item-icon-left">
+          <a href="#tab/project/expense/{{project.Id}}" class="item item-icon-left" id="view-exp-recs">
             <i class="icon ion-card"></i>
             View Expense Records
           </a>

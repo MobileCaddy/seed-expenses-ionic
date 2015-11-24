@@ -6,7 +6,7 @@ exports.config = {
   },
   suites: {
     // stories - add e2e stories etc like this
-    // story1:  'e2e/story1.test.spec.js',
+    story1:  'e2e/story1.test.spec.js',
 
     // pages - Can also test just specific pages
     settings: 'e2e/settings.test.spec.js'

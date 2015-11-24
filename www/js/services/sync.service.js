@@ -32,23 +32,24 @@
 	      //console.log("mc setSyncLock", syncLockName, status);
 	    },
 
-	    getSyncState: function(){
-	      var syncState = localStorage.getItem("syncState");
-	      if (syncState === null) {
-	        syncState = "Complete";
-	        localStorage.setItem("syncState", syncState);
-	      }
-	      //console.log("mc getSyncState syncState", syncState);
-	      return syncState;
-	    },
+	    getSyncState: getSyncState,
 
-	    setSyncState: function(status){
-	      localStorage.setItem("syncState", status);
-	      //console.log("mc setSyncState", "syncState", status);
-	    },
+	    setSyncState: setSyncState,
+
+	    initialSync: initialSync,
 
 	    syncTables: syncTables
 	  };
+
+
+	  function initialSync(tablesToSync) {
+	    setSyncState("Syncing");
+
+	    devUtils.initialSync(tablesToSync).then(function(res){
+	      $rootScope.$broadcast('syncTables', {result : "Complete"});
+	      setSyncState("Complete");
+	    });
+	  }
 
 
 	  function  syncTables(tablesToSync, syncWithoutLocalUpdates, maxTableAge) {
@@ -126,6 +127,19 @@
 	      });
 	    });
 	  }
+
+	  function getSyncState(){
+      var syncState = localStorage.getItem("syncState");
+      if (syncState === null) {
+        syncState = "Complete";
+        localStorage.setItem("syncState", syncState);
+      }
+      return syncState;
+    }
+
+ 		function setSyncState(status){
+      localStorage.setItem("syncState", status);
+    }
 
   }
 
