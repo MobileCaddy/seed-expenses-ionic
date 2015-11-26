@@ -1,4 +1,4 @@
-angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', 'ngCordova'])
+angular.module('starter', ['ionic', 'ngIOS9UIWebViewPatch', 'starter.services', 'starter.controllers', 'ngCordova'])
 
 .run(['$ionicPlatform', '$rootScope', 'NetworkService', 'AppRunStatusService', 'NotificationService', function($ionicPlatform, $rootScope, NetworkService, AppRunStatusService, NotificationService) {
   $ionicPlatform.ready(function() {
